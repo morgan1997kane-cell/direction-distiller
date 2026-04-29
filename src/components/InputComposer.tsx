@@ -70,6 +70,10 @@ function getFallbackNotice(error: unknown) {
     return "\u771f\u5b9e AI \u54cd\u5e94\u8d85\u65f6\uff0c\u5df2\u5207\u6362\u4e3a\u672c\u5730\u6f14\u793a\u7ed3\u679c\u3002";
   }
 
+  if (/local \/ ollama|ollama|localhost:11434/i.test(message)) {
+    return "Local / Ollama \u4ec5\u652f\u6301\u672c\u5730\u8fd0\u884c\u7248\u672c\uff0c\u5f53\u524d\u5df2\u5207\u6362\u4e3a Demo \u7ed3\u679c\u3002";
+  }
+
   if (/missing api key|401|403|unauthorized|forbidden|unsupported model|unsupported ai provider/i.test(message)) {
     return "\u5f53\u524d\u6a21\u578b\u6682\u65f6\u4e0d\u53ef\u7528\uff0c\u5df2\u4f7f\u7528 Demo \u7ed3\u679c\u3002";
   }

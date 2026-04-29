@@ -25,6 +25,13 @@ interface ReferenceImagePayload {
   size: number;
 }
 
+interface OllamaChatResponse {
+  message?: {
+    content?: unknown;
+  };
+  error?: unknown;
+}
+
 function isRecord(value: unknown): value is Record<string, unknown> {
   return typeof value === "object" && value !== null && !Array.isArray(value);
 }
@@ -117,6 +124,49 @@ function safeErrorMessage(error: unknown) {
   return "Unknown generation error";
 }
 
+function isVercelProduction() {
+  return process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
+}
+
+async function generateWithOllama(config: { baseURL: string; model: string }, input: DirectionInput) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 60_000);
+  const endpoint = `${config.baseURL.replace(/\/$/, "")}/api/chat`;
+
+  try {
+    const response = await fetch(endpoint, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        model: config.model,
+        messages: [
+          { role: "system", content: buildSystemPrompt() },
+          { role: "user", content: buildUserPrompt(input) },
+        ],
+        stream: false,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) {
+      const message = await response.text();
+      throw new Error(message || `Ollama request failed with ${response.status}`);
+    }
+
+    const data = (await response.json()) as OllamaChatResponse;
+    if (data.error) {
+      throw new Error(String(data.error));
+    }
+
+    const content = data.message?.content;
+    return typeof content === "string" ? content : "";
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export async function POST(request: Request) {
   let body: GenerateDirectionRequest;
 
@@ -149,24 +199,38 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: `Missing API key for AI_PROVIDER=${config.provider}` }, { status: 500 });
   }
 
-  const client = new OpenAI({
-    apiKey: config.apiKey,
-    baseURL: config.baseURL,
-    timeout: 60_000,
-  });
-
   try {
-    const completion = await client.chat.completions.create({
-      model: config.model,
-      messages: [
-        { role: "system", content: buildSystemPrompt() },
-        { role: "user", content: buildUserPrompt(input) },
-      ],
-      temperature: 0.7,
-      max_tokens: 2200,
-    });
+    let content = "";
 
-    const content = completion.choices[0]?.message?.content;
+    if (config.provider === "ollama") {
+      if (isVercelProduction()) {
+        return NextResponse.json(
+          { error: "Local / Ollama provider is only available when running Direction Distiller locally." },
+          { status: 502 },
+        );
+      }
+
+      content = await generateWithOllama(config, input);
+    } else {
+      const client = new OpenAI({
+        apiKey: config.apiKey,
+        baseURL: config.baseURL,
+        timeout: 60_000,
+      });
+
+      const completion = await client.chat.completions.create({
+        model: config.model,
+        messages: [
+          { role: "system", content: buildSystemPrompt() },
+          { role: "user", content: buildUserPrompt(input) },
+        ],
+        temperature: 0.7,
+        max_tokens: 2200,
+      });
+
+      content = completion.choices[0]?.message?.content ?? "";
+    }
+
     if (!content) {
       console.error("generate-direction empty response", {
         provider: config.provider,

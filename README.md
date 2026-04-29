@@ -99,6 +99,29 @@ OPENAI_MODEL=gpt-5.5
 
 选择结果会保存在 localStorage，刷新页面后保留。后端会对 provider / model 做 allowlist 校验，不允许任意模型名直接透传。没有对应 API key 或 API 调用失败时，会自动 fallback 到 Demo 模式。
 
+## Local / Ollama Provider
+
+v0.4.0 adds a Local / Ollama provider for local development only.
+
+- Provider list now includes `demo`, `deepseek`, `gemini`, `openai`, and `ollama`.
+- Ollama model allowlist: `qwen2.5:7b`, `qwen2.5:14b`, `llama3.1:8b`, `deepseek-r1:7b`.
+- Vercel production cannot access a user's `http://localhost:11434`; choosing Local / Ollama online returns a clear error and falls back to Demo.
+- Install and start Ollama yourself before using this provider.
+- Local env example:
+
+```bash
+OLLAMA_BASE_URL=http://localhost:11434
+OLLAMA_MODEL=qwen2.5:7b
+```
+
+Run locally:
+
+```bash
+npm run dev
+```
+
+Open `http://localhost:3000`, choose Provider `Local / Ollama`, then choose an installed model.
+
 ## Provider Response Normalization
 
 服务端会对模型返回做兼容解析：
@@ -201,6 +224,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 - v0.3.3：增强 provider 响应解析与 DirectionResult normalize 层
 
 v0.3.4: generation experience upgrade with staged loading copy, result skeleton, clearer AI mode, and better fallback notices.
+v0.4.0: Local / Ollama provider support for local development, with Vercel production fallback to Demo.
 
 相关 Git 提交记录中应包含：
 
@@ -214,6 +238,7 @@ v0.3.4: generation experience upgrade with staged loading copy, result skeleton,
 - Add provider and model switcher
 - Normalize provider response for live AI generation
 - Improve generation experience and loading states
+- Add local Ollama provider support
 
 ## Notes for AI Coding Agents
 

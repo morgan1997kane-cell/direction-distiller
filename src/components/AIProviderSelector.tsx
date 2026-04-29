@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import {
   getDefaultModel,
   PROVIDER_LABELS,
@@ -22,6 +23,11 @@ export function AIProviderSelector({
   onModelChange,
 }: AIProviderSelectorProps) {
   const modelOptions = SUPPORTED_MODELS[provider];
+  const [isLocalPage, setIsLocalPage] = useState(false);
+
+  useEffect(() => {
+    setIsLocalPage(["localhost", "127.0.0.1", "::1"].includes(window.location.hostname));
+  }, []);
 
   return (
     <section className="border border-white/10 bg-black/25 p-3">
@@ -30,7 +36,7 @@ export function AIProviderSelector({
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/45">AI Settings</p>
           <h3 className="mt-1 text-sm font-medium text-zinc-200">Provider / Model</h3>
         </div>
-        <span className="text-xs text-zinc-600">{provider === "demo" ? "Local" : "Live API"}</span>
+        <span className="text-xs text-zinc-600">{provider === "demo" ? "Local" : provider === "ollama" ? "Local API" : "Live API"}</span>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
@@ -65,6 +71,14 @@ export function AIProviderSelector({
           </select>
         </label>
       </div>
+
+      {provider === "ollama" ? (
+        <p className="mt-3 border-t border-white/10 pt-3 text-xs leading-5 text-zinc-500">
+          {isLocalPage
+            ? "Local / Ollama 仅在本地运行版本可用。请先启动本地模型服务，例如 Ollama。"
+            : "线上版本无法访问你的本地模型服务，请在本地运行项目后使用 Local / Ollama。"}
+        </p>
+      ) : null}
     </section>
   );
 }

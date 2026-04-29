@@ -249,6 +249,16 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Fallback notices should explain the user-facing outcome without exposing API keys or raw provider errors.
 - Do not remove the loading skeleton or stage progression when adjusting generation flow.
 
+## Local / Ollama Provider
+
+- v0.4.0 adds `ollama` as a Local / Ollama provider for local development only.
+- Provider list includes `demo`, `deepseek`, `gemini`, `openai`, and `ollama`.
+- Ollama defaults: `OLLAMA_BASE_URL=http://localhost:11434`, `OLLAMA_MODEL=qwen2.5:7b`.
+- Ollama does not require an API key.
+- Supported Ollama model options are allowlisted: `qwen2.5:7b`, `qwen2.5:14b`, `llama3.1:8b`, `deepseek-r1:7b`.
+- Vercel production cannot access a user's local `localhost:11434`; if `ollama` is selected online, the API should return a clear error and the frontend should fallback to Demo.
+- Do not add automatic model downloads, an Ollama installer, or image recognition.
+
 ## Current Version History
 
 当前可见版本号维护在 `src/lib/version.ts`。
@@ -269,6 +279,7 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - v0.3.3：增强 provider 响应解析与 DirectionResult normalize 层
 
 v0.3.4: generation experience upgrade with staged loading copy, result skeleton, clearer AI mode, and better fallback notices.
+v0.4.0: Local / Ollama provider support for local development, with Vercel production fallback to Demo.
 
 相关 Git 提交记录中应包含：
 
@@ -282,6 +293,7 @@ v0.3.4: generation experience upgrade with staged loading copy, result skeleton,
 - Add provider and model switcher
 - Normalize provider response for live AI generation
 - Improve generation experience and loading states
+- Add local Ollama provider support
 
 ## Do Not Do Unless Explicitly Asked
 

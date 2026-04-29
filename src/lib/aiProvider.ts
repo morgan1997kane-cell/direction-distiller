@@ -1,4 +1,4 @@
-export type AIProvider = "deepseek" | "openai";
+export type AIProvider = "deepseek" | "gemini" | "openai";
 
 export interface AIProviderConfig {
   provider: AIProvider;
@@ -8,7 +8,8 @@ export interface AIProviderConfig {
 }
 
 function normalizeProvider(value: string | undefined): AIProvider {
-  return value === "openai" ? "openai" : "deepseek";
+  if (value === "gemini" || value === "openai") return value;
+  return "deepseek";
 }
 
 export function getAIProviderConfig(): AIProviderConfig {
@@ -20,6 +21,15 @@ export function getAIProviderConfig(): AIProviderConfig {
       apiKey: process.env.OPENAI_API_KEY,
       baseURL: process.env.OPENAI_BASE_URL || "https://api.openai.com/v1",
       model: process.env.OPENAI_MODEL || "gpt-5.5",
+    };
+  }
+
+  if (provider === "gemini") {
+    return {
+      provider,
+      apiKey: process.env.GEMINI_API_KEY,
+      baseURL: process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai/",
+      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
     };
   }
 

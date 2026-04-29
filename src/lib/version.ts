@@ -1,2 +1,2 @@
 export const APP_VERSION = "v0.3.3";
-export const APP_VERSION_LABEL = "Provider Switch Ready";
+export const APP_VERSION_LABEL = "Response Normalized";

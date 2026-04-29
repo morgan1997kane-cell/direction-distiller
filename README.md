@@ -99,6 +99,17 @@ OPENAI_MODEL=gpt-5.5
 
 选择结果会保存在 localStorage，刷新页面后保留。后端会对 provider / model 做 allowlist 校验，不允许任意模型名直接透传。没有对应 API key 或 API 调用失败时，会自动 fallback 到 Demo 模式。
 
+## Provider Response Normalization
+
+服务端会对模型返回做兼容解析：
+
+- 支持从 markdown code block 或混杂文本中提取 JSON object
+- 支持字段别名映射，例如 `candidates` / `recommendation` / `package` / `prompts`
+- 缺失字段会尽量补齐为当前前端可用的 `DirectionResult`
+- 候选方向会归一化为 `稳妥型` / `大胆型` / `执行型` 三个方向
+- `recommended_direction.candidate_id` 会修正到合法候选 id
+- 只有完全无法提取 JSON 或 normalize 后仍不可用时，才 fallback 到 Demo
+
 ## Local Development
 
 安装依赖：
@@ -177,6 +188,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 - v0.3.1：默认支持 DeepSeek 国内供应商，通过 OpenAI-compatible baseURL 保留 OpenAI 扩展能力
 - v0.3.2：新增 Gemini provider 支持，形成 DeepSeek / Gemini / OpenAI 三供应商配置
 - v0.3.3：新增前端 provider / model 手动切换，并在后端做 allowlist 校验
+- v0.3.3：增强 provider 响应解析与 DirectionResult normalize 层
 
 相关 Git 提交记录中应包含：
 
@@ -188,6 +200,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 - Add DeepSeek provider support
 - Add Gemini provider support
 - Add provider and model switcher
+- Normalize provider response for live AI generation
 
 ## Notes for AI Coding Agents
 

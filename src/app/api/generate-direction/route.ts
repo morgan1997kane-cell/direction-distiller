@@ -2,6 +2,8 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { getAIProviderConfig, isSupportedModel, isSupportedProvider, normalizeProvider } from "@/lib/aiProvider";
 import { normalizeDirectionResult, validateDirectionResult } from "@/lib/directionSchema";
+import { extractJsonFromText } from "@/lib/extractJsonFromText";
+import { normalizeProviderDirectionResult } from "@/lib/normalizeDirectionResult";
 import type { DirectionInput, ReferenceImage } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -115,20 +117,6 @@ function safeErrorMessage(error: unknown) {
   return "Unknown generation error";
 }
 
-function extractJsonObject(text: string) {
-  const trimmed = text.trim();
-  try {
-    return JSON.parse(trimmed) as unknown;
-  } catch {
-    const start = trimmed.indexOf("{");
-    const end = trimmed.lastIndexOf("}");
-    if (start === -1 || end === -1 || end <= start) {
-      throw new Error("No JSON object found in model output");
-    }
-    return JSON.parse(trimmed.slice(start, end + 1)) as unknown;
-  }
-}
-
 export async function POST(request: Request) {
   let body: GenerateDirectionRequest;
 
@@ -179,16 +167,64 @@ export async function POST(request: Request) {
 
     const content = completion.choices[0]?.message?.content;
     if (!content) {
+      console.error("generate-direction empty response", {
+        provider: config.provider,
+        model: config.model,
+      });
       return NextResponse.json({ error: `${config.provider} returned an empty response` }, { status: 502 });
     }
 
-    const parsed = extractJsonObject(content);
+    console.log("generate-direction raw response", {
+      provider: config.provider,
+      model: config.model,
+      preview: content.slice(0, 1000),
+    });
 
-    if (!validateDirectionResult(parsed)) {
+    let parsed: unknown;
+    try {
+      const jsonText = extractJsonFromText(content);
+      parsed = JSON.parse(jsonText) as unknown;
+      console.log("generate-direction json extraction succeeded", {
+        provider: config.provider,
+        model: config.model,
+        length: jsonText.length,
+      });
+    } catch (error) {
+      console.error("generate-direction json extraction failed", {
+        provider: config.provider,
+        model: config.model,
+        message: safeErrorMessage(error),
+      });
+      return NextResponse.json({ error: "Live AI JSON extraction failed" }, { status: 502 });
+    }
+
+    const normalized = normalizeProviderDirectionResult(parsed, input);
+    if (!normalized) {
+      console.error("generate-direction normalization failed", {
+        provider: config.provider,
+        model: config.model,
+        reason: "normalizeProviderDirectionResult returned null",
+      });
+      return NextResponse.json({ error: `${config.provider} returned an unrecoverable DirectionResult` }, { status: 502 });
+    }
+
+    const result = normalizeDirectionResult(normalized, input, "live", config.provider, config.model);
+
+    if (!validateDirectionResult(result)) {
+      console.error("generate-direction validation failed after normalization", {
+        provider: config.provider,
+        model: config.model,
+      });
       return NextResponse.json({ error: `${config.provider} returned an incompatible DirectionResult` }, { status: 502 });
     }
 
-    return NextResponse.json(normalizeDirectionResult(parsed, input, "live", config.provider, config.model));
+    console.log("generate-direction normalization succeeded", {
+      provider: config.provider,
+      model: config.model,
+      candidates: result.candidate_directions.length,
+    });
+
+    return NextResponse.json(result);
   } catch (error) {
     console.error("generate-direction failed", {
       provider: config.provider,

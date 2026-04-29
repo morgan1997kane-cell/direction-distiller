@@ -21,6 +21,7 @@ Direction Distiller 不是普通灵感笔记，也不是聊天式脑暴工具。
 - 选择项目类型、输出目标和风格标签
 - 默认使用服务端 DeepSeek API 生成结果
 - 可通过环境变量切换到 Gemini 或 OpenAI-compatible 供应商
+- 可在页面中手动切换 provider / model
 - 无 API key 或 API 失败时 fallback 到本地 mock generator
 - 生成 3 个视觉方向候选
 - 生成 1 个推荐方向
@@ -85,7 +86,18 @@ OPENAI_MODEL=gpt-5.5
 - 如果当前账号或环境暂时不支持默认模型，可以通过对应的 `*_MODEL` 切换为可用模型
 - 不要把真实 API key 提交到仓库
 - 如果没有配置对应 API key，前端会自动 fallback 到本地 mock generator
-- 当前 v0.3.2 仍不支持参考图真实识别，只把参考图数量、文件名、MIME 类型和 size 作为文本上下文传给 API
+- 当前 v0.3.3 仍不支持参考图真实识别，只把参考图数量、文件名、MIME 类型和 size 作为文本上下文传给 API
+
+## Provider / Model Switcher
+
+输入区包含轻量 AI 设置区，可手动切换 provider / model：
+
+- `demo`：直接使用本地 mock generator，不请求真实 API
+- `deepseek`：`deepseek-chat`
+- `gemini`：`gemini-2.5-flash`
+- `openai`：`gpt-5.4-mini` / `gpt-5.5`
+
+选择结果会保存在 localStorage，刷新页面后保留。后端会对 provider / model 做 allowlist 校验，不允许任意模型名直接透传。没有对应 API key 或 API 调用失败时，会自动 fallback 到 Demo 模式。
 
 ## Local Development
 
@@ -164,6 +176,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 - v0.3：新增真实 OpenAI API 生成模式，并保留 mock fallback
 - v0.3.1：默认支持 DeepSeek 国内供应商，通过 OpenAI-compatible baseURL 保留 OpenAI 扩展能力
 - v0.3.2：新增 Gemini provider 支持，形成 DeepSeek / Gemini / OpenAI 三供应商配置
+- v0.3.3：新增前端 provider / model 手动切换，并在后端做 allowlist 校验
 
 相关 Git 提交记录中应包含：
 
@@ -174,6 +187,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 - Add live AI generation API with mock fallback
 - Add DeepSeek provider support
 - Add Gemini provider support
+- Add provider and model switcher
 
 ## Notes for AI Coding Agents
 

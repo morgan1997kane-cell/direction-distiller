@@ -248,6 +248,7 @@ export function normalizeDirectionResult(
   input: DirectionInput,
   mode: "live" | "demo",
   provider?: string,
+  model?: string,
 ): DirectionResult {
   return {
     ...result,
@@ -255,6 +256,7 @@ export function normalizeDirectionResult(
     createdAt: result.createdAt || new Date().toISOString(),
     ai_mode: mode,
     ai_provider: provider ?? result.ai_provider,
+    ai_model: model ?? result.ai_model,
     project_type: input.projectType,
     output_goal: input.outputGoal,
     style_tags: input.styleTags.length > 0 ? input.styleTags : result.style_tags,

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { outputGoals, projectTypes, styleTags } from "@/data/presets";
+import { AIProviderSelector } from "@/components/AIProviderSelector";
 import { ExamplePrompts } from "@/components/ExamplePrompts";
 import { Hero } from "@/components/Hero";
 import { HistoryPanel } from "@/components/HistoryPanel";
@@ -11,6 +12,13 @@ import { ProductIntro } from "@/components/ProductIntro";
 import { ResultPanel } from "@/components/ResultPanel";
 import { VersionBadge } from "@/components/VersionBadge";
 import { ValueFlow } from "@/components/ValueFlow";
+import {
+  getDefaultModel,
+  isSupportedModel,
+  isSupportedProvider,
+  normalizeModel,
+  type AIProvider,
+} from "@/lib/aiProvider";
 import { normalizeDirectionResult } from "@/lib/directionSchema";
 import { generateDirection } from "@/lib/generateDirection";
 import { generateDirectionResult } from "@/lib/mockGenerator";
@@ -39,6 +47,9 @@ const defaultInput: DirectionInput = {
   styleTags: [],
 };
 
+const AI_SETTINGS_KEY = "direction-distiller-ai-settings";
+const defaultAIProvider: AIProvider = "deepseek";
+
 export function InputComposer() {
   const [brief, setBrief] = useState(defaultInput.brief);
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
@@ -51,6 +62,8 @@ export function InputComposer() {
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [aiProvider, setAiProvider] = useState<AIProvider>(defaultAIProvider);
+  const [aiModel, setAiModel] = useState<string>(getDefaultModel(defaultAIProvider));
   const [savedResultId, setSavedResultId] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -63,9 +76,39 @@ export function InputComposer() {
   };
 
   useEffect(() => {
-    const timer = window.setTimeout(() => setHistory(getSavedResults()), 0);
+    const timer = window.setTimeout(() => {
+      setHistory(getSavedResults());
+
+      try {
+        const raw = window.localStorage.getItem(AI_SETTINGS_KEY);
+        if (!raw) return;
+        const saved = JSON.parse(raw) as { provider?: unknown; model?: unknown };
+        if (!isSupportedProvider(saved.provider)) return;
+        setAiProvider(saved.provider);
+        setAiModel(normalizeModel(saved.provider, saved.model));
+      } catch {
+        window.localStorage.removeItem(AI_SETTINGS_KEY);
+      }
+    }, 0);
     return () => window.clearTimeout(timer);
   }, []);
+
+  function persistAISettings(provider: AIProvider, model: string) {
+    window.localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify({ provider, model }));
+  }
+
+  function updateAIProvider(provider: AIProvider) {
+    const nextModel = getDefaultModel(provider);
+    setAiProvider(provider);
+    setAiModel(nextModel);
+    persistAISettings(provider, nextModel);
+  }
+
+  function updateAIModel(model: string) {
+    const nextModel = isSupportedModel(aiProvider, model) ? model : getDefaultModel(aiProvider);
+    setAiModel(nextModel);
+    persistAISettings(aiProvider, nextModel);
+  }
 
   function fillExample(example: ExamplePrompt) {
     setBrief(example.brief);
@@ -90,7 +133,14 @@ export function InputComposer() {
     const generationInput = currentInput;
 
     try {
-      const nextResult = await generateDirection(generationInput);
+      if (aiProvider === "demo") {
+        const demoResult = normalizeDirectionResult(generateDirectionResult(generationInput), generationInput, "demo");
+        setResult(demoResult);
+        setResultInput(generationInput);
+        return;
+      }
+
+      const nextResult = await generateDirection(generationInput, { provider: aiProvider, model: aiModel });
       setResult(nextResult);
       setResultInput(generationInput);
     } catch (generationError) {
@@ -181,6 +231,12 @@ export function InputComposer() {
 
           <div className="mt-6 grid gap-6">
             <ImageUploader images={referenceImages} onChange={setReferenceImages} />
+            <AIProviderSelector
+              provider={aiProvider}
+              model={aiModel}
+              onProviderChange={updateAIProvider}
+              onModelChange={updateAIModel}
+            />
             <OptionChips
               label="项目类型"
               options={projectTypes}

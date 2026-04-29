@@ -7,6 +7,7 @@ import { ExecutionAdviceCard } from "@/components/ExecutionAdviceCard";
 import { PromptPackageCard } from "@/components/PromptPackageCard";
 import { ProposalCopyCard } from "@/components/ProposalCopyCard";
 import { RecommendedDirectionCard } from "@/components/RecommendedDirectionCard";
+import { isSupportedProvider, PROVIDER_LABELS } from "@/lib/aiProvider";
 import { copyText, formatDirectionMarkdown, formatPromptMarkdown } from "@/lib/copy";
 
 interface ResultPanelProps {
@@ -19,13 +20,17 @@ interface ResultPanelProps {
 }
 
 export function ResultPanel({ result, input, saved, onSave, onRegenerate, onClear }: ResultPanelProps) {
+  const providerLabel =
+    result.ai_provider && isSupportedProvider(result.ai_provider) ? PROVIDER_LABELS[result.ai_provider] : result.ai_provider;
+  const liveLabel = ["Live", providerLabel, result.ai_model].filter(Boolean).join(" · ");
+
   return (
     <section className="space-y-6">
       <header className="border-b border-white/10 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/50">Distilled Proposal</p>
           <span className="border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs uppercase tracking-[0.18em] text-zinc-400">
-            AI Mode: {result.ai_mode === "live" ? `Live${result.ai_provider ? ` · ${result.ai_provider}` : ""}` : "Demo"}
+            AI Mode: {result.ai_mode === "live" ? liveLabel : "Demo"}
           </span>
         </div>
         <h2 className="mt-3 text-3xl font-semibold text-zinc-50">方向压缩结果</h2>

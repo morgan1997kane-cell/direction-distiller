@@ -1,26 +1,64 @@
-export type AIProvider = "deepseek" | "gemini" | "openai";
+export const SUPPORTED_MODELS = {
+  demo: ["Demo Generator"],
+  deepseek: ["deepseek-chat"],
+  gemini: ["gemini-2.5-flash"],
+  openai: ["gpt-5.4-mini", "gpt-5.5"],
+} as const;
+
+export const SUPPORTED_PROVIDERS = Object.keys(SUPPORTED_MODELS) as AIProvider[];
+
+export const PROVIDER_LABELS: Record<AIProvider, string> = {
+  demo: "Demo",
+  deepseek: "DeepSeek",
+  gemini: "Gemini",
+  openai: "OpenAI",
+};
+
+export type AIProvider = keyof typeof SUPPORTED_MODELS;
+export type LiveAIProvider = Exclude<AIProvider, "demo">;
 
 export interface AIProviderConfig {
-  provider: AIProvider;
+  provider: LiveAIProvider;
   apiKey: string | undefined;
   baseURL: string;
   model: string;
 }
 
-function normalizeProvider(value: string | undefined): AIProvider {
-  if (value === "gemini" || value === "openai") return value;
-  return "deepseek";
+export function isSupportedProvider(value: unknown): value is AIProvider {
+  return typeof value === "string" && value in SUPPORTED_MODELS;
 }
 
-export function getAIProviderConfig(): AIProviderConfig {
-  const provider = normalizeProvider(process.env.AI_PROVIDER);
+export function getDefaultModel(provider: AIProvider) {
+  return SUPPORTED_MODELS[provider][0];
+}
+
+export function isSupportedModel(provider: AIProvider, model: unknown): model is string {
+  return typeof model === "string" && (SUPPORTED_MODELS[provider] as readonly string[]).includes(model);
+}
+
+export function normalizeProvider(value: unknown): AIProvider {
+  return isSupportedProvider(value) ? value : "deepseek";
+}
+
+export function normalizeModel(provider: AIProvider, model: unknown) {
+  return isSupportedModel(provider, model) ? model : getDefaultModel(provider);
+}
+
+export function getAIProviderConfig(options?: { provider?: unknown; model?: unknown }): AIProviderConfig {
+  const provider = normalizeProvider(options?.provider ?? process.env.AI_PROVIDER);
+
+  if (provider === "demo") {
+    throw new Error("Demo provider does not use the live API");
+  }
+
+  const model = normalizeModel(provider, options?.model);
 
   if (provider === "openai") {
     return {
       provider,
       apiKey: process.env.OPENAI_API_KEY,
       baseURL: process.env.OPENAI_BASE_URL || "https://api.openai.com/v1",
-      model: process.env.OPENAI_MODEL || "gpt-5.5",
+      model,
     };
   }
 
@@ -29,7 +67,7 @@ export function getAIProviderConfig(): AIProviderConfig {
       provider,
       apiKey: process.env.GEMINI_API_KEY,
       baseURL: process.env.GEMINI_BASE_URL || "https://generativelanguage.googleapis.com/v1beta/openai/",
-      model: process.env.GEMINI_MODEL || "gemini-2.5-flash",
+      model,
     };
   }
 
@@ -37,6 +75,6 @@ export function getAIProviderConfig(): AIProviderConfig {
     provider,
     apiKey: process.env.DEEPSEEK_API_KEY,
     baseURL: process.env.DEEPSEEK_BASE_URL || "https://api.deepseek.com",
-    model: process.env.DEEPSEEK_MODEL || "deepseek-chat",
+    model,
   };
 }

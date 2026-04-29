@@ -1,6 +1,6 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
-import { getAIProviderConfig } from "@/lib/aiProvider";
+import { getAIProviderConfig, isSupportedModel, isSupportedProvider, normalizeProvider } from "@/lib/aiProvider";
 import { normalizeDirectionResult, validateDirectionResult } from "@/lib/directionSchema";
 import type { DirectionInput, ReferenceImage } from "@/lib/types";
 
@@ -12,6 +12,8 @@ interface GenerateDirectionRequest {
   outputGoal?: unknown;
   styleTags?: unknown;
   referenceImages?: unknown;
+  provider?: unknown;
+  model?: unknown;
 }
 
 interface ReferenceImagePayload {
@@ -142,7 +144,19 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "brief or referenceImages is required" }, { status: 400 });
   }
 
-  const config = getAIProviderConfig();
+  if (body.provider !== undefined && !isSupportedProvider(body.provider)) {
+    return NextResponse.json({ error: "Unsupported AI provider" }, { status: 400 });
+  }
+
+  const requestedProvider = body.provider === undefined ? normalizeProvider(process.env.AI_PROVIDER) : body.provider;
+  if (requestedProvider === "demo") {
+    return NextResponse.json({ error: "Demo provider should be generated on the client" }, { status: 400 });
+  }
+  if (body.model !== undefined && !isSupportedModel(requestedProvider, body.model)) {
+    return NextResponse.json({ error: "Unsupported model for selected provider" }, { status: 400 });
+  }
+
+  const config = getAIProviderConfig({ provider: requestedProvider, model: body.model });
   if (!config.apiKey) {
     return NextResponse.json({ error: `Missing API key for AI_PROVIDER=${config.provider}` }, { status: 500 });
   }
@@ -174,7 +188,7 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: `${config.provider} returned an incompatible DirectionResult` }, { status: 502 });
     }
 
-    return NextResponse.json(normalizeDirectionResult(parsed, input, "live", config.provider));
+    return NextResponse.json(normalizeDirectionResult(parsed, input, "live", config.provider, config.model));
   } catch (error) {
     console.error("generate-direction failed", {
       provider: config.provider,

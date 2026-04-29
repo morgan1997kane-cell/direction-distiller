@@ -106,6 +106,7 @@ export interface DirectionResult {
   createdAt: string;
   ai_mode?: "live" | "demo";
   ai_provider?: string;
+  ai_model?: string;
   project_type: ProjectType;
   output_goal: OutputGoal;
   input_summary: string;

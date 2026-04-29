@@ -163,6 +163,7 @@ export async function POST(request: Request) {
         { role: "user", content: buildUserPrompt(input) },
       ],
       temperature: 0.7,
+      max_tokens: 2200,
     });
 
     const content = completion.choices[0]?.message?.content;

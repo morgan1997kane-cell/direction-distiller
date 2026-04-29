@@ -110,6 +110,16 @@ OPENAI_MODEL=gpt-5.5
 - `recommended_direction.candidate_id` 会修正到合法候选 id
 - 只有完全无法提取 JSON 或 normalize 后仍不可用时，才 fallback 到 Demo
 
+## Generation Experience
+
+v0.3.4 adds a clearer generation waiting state for Live API calls:
+
+- The result area shows a proposal-style skeleton while generation is running.
+- Loading copy advances through stages such as brief understanding, reference sorting, direction candidates, recommendation, proposal copy, prompt package, and execution advice.
+- Live mode reminds users that generation usually takes 15-40 seconds.
+- Demo mode uses a shorter local-generation hint.
+- Fallback notices are more specific and still keep technical details hidden.
+
 ## Local Development
 
 安装依赖：
@@ -190,6 +200,8 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 - v0.3.3：新增前端 provider / model 手动切换，并在后端做 allowlist 校验
 - v0.3.3：增强 provider 响应解析与 DirectionResult normalize 层
 
+v0.3.4: generation experience upgrade with staged loading copy, result skeleton, clearer AI mode, and better fallback notices.
+
 相关 Git 提交记录中应包含：
 
 - Initial / Create Next App 初始工程
@@ -201,6 +213,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 - Add Gemini provider support
 - Add provider and model switcher
 - Normalize provider response for live AI generation
+- Improve generation experience and loading states
 
 ## Notes for AI Coding Agents
 

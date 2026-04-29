@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react";
 import { outputGoals, projectTypes, styleTags } from "@/data/presets";
 import { AIProviderSelector } from "@/components/AIProviderSelector";
 import { ExamplePrompts } from "@/components/ExamplePrompts";
+import { GenerationLoadingState } from "@/components/GenerationLoadingState";
 import { Hero } from "@/components/Hero";
 import { HistoryPanel } from "@/components/HistoryPanel";
 import { ImageUploader } from "@/components/ImageUploader";
@@ -49,6 +50,36 @@ const defaultInput: DirectionInput = {
 
 const AI_SETTINGS_KEY = "direction-distiller-ai-settings";
 const defaultAIProvider: AIProvider = "deepseek";
+const generationStages = [
+  "\u6b63\u5728\u7406\u89e3 brief",
+  "\u6b63\u5728\u6574\u7406\u53c2\u8003\u56fe\u4fe1\u606f",
+  "\u6b63\u5728\u751f\u6210\u65b9\u5411\u5019\u9009",
+  "\u6b63\u5728\u8bc4\u4f30\u63a8\u8350\u65b9\u5411",
+  "\u6b63\u5728\u6574\u7406\u63d0\u6848\u6587\u6848\u4e0e Prompt \u5305",
+  "\u6b63\u5728\u751f\u6210\u6267\u884c\u5efa\u8bae",
+];
+
+function getFallbackNotice(error: unknown) {
+  const message = error instanceof Error ? error.message : "";
+
+  if (error instanceof DOMException && error.name === "AbortError") {
+    return "\u771f\u5b9e AI \u54cd\u5e94\u8d85\u65f6\uff0c\u5df2\u5207\u6362\u4e3a\u672c\u5730\u6f14\u793a\u7ed3\u679c\u3002";
+  }
+
+  if (/timeout|abort/i.test(message)) {
+    return "\u771f\u5b9e AI \u54cd\u5e94\u8d85\u65f6\uff0c\u5df2\u5207\u6362\u4e3a\u672c\u5730\u6f14\u793a\u7ed3\u679c\u3002";
+  }
+
+  if (/missing api key|401|403|unauthorized|forbidden|unsupported model|unsupported ai provider/i.test(message)) {
+    return "\u5f53\u524d\u6a21\u578b\u6682\u65f6\u4e0d\u53ef\u7528\uff0c\u5df2\u4f7f\u7528 Demo \u7ed3\u679c\u3002";
+  }
+
+  if (/json|directionresult|incompatible|schema|structure/i.test(message)) {
+    return "\u771f\u5b9e AI \u8fd4\u56de\u7ed3\u6784\u5f02\u5e38\uff0c\u5df2\u5207\u6362\u4e3a Demo \u7ed3\u679c\u3002";
+  }
+
+  return "\u8bf7\u6c42\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5\uff1b\u5f53\u524d\u5df2\u4f7f\u7528 Demo \u7ed3\u679c\u3002";
+}
 
 export function InputComposer() {
   const [brief, setBrief] = useState(defaultInput.brief);
@@ -60,6 +91,7 @@ export function InputComposer() {
   const [resultInput, setResultInput] = useState<DirectionInput | null>(null);
   const [history, setHistory] = useState<SavedDirectionResult[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
+  const [generationStageIndex, setGenerationStageIndex] = useState(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
   const [aiProvider, setAiProvider] = useState<AIProvider>(defaultAIProvider);
@@ -92,6 +124,19 @@ export function InputComposer() {
     }, 0);
     return () => window.clearTimeout(timer);
   }, []);
+
+  useEffect(() => {
+    if (!isGenerating) {
+      setGenerationStageIndex(0);
+      return;
+    }
+
+    const interval = window.setInterval(() => {
+      setGenerationStageIndex((current) => Math.min(current + 1, generationStages.length - 1));
+    }, 5200);
+
+    return () => window.clearInterval(interval);
+  }, [isGenerating]);
 
   function persistAISettings(provider: AIProvider, model: string) {
     window.localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify({ provider, model }));
@@ -129,11 +174,15 @@ export function InputComposer() {
     setError("");
     setNotice("");
     setSavedResultId("");
+    setGenerationStageIndex(0);
     setIsGenerating(true);
     const generationInput = currentInput;
 
+    window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 80);
+
     try {
       if (aiProvider === "demo") {
+        setGenerationStageIndex(generationStages.length - 1);
         const demoResult = normalizeDirectionResult(generateDirectionResult(generationInput), generationInput, "demo");
         setResult(demoResult);
         setResultInput(generationInput);
@@ -148,7 +197,7 @@ export function InputComposer() {
       const fallbackResult = normalizeDirectionResult(generateDirectionResult(generationInput), generationInput, "demo");
       setResult(fallbackResult);
       setResultInput(generationInput);
-      setNotice("真实 AI 暂时不可用，已使用本地演示生成结果。");
+      setNotice(getFallbackNotice(generationError));
     } finally {
       setIsGenerating(false);
       window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -215,7 +264,7 @@ export function InputComposer() {
             {isGenerating ? (
               <div className="flex shrink-0 items-center gap-2 border border-cyan-200/20 bg-cyan-300/[0.07] px-3 py-2 text-sm text-cyan-100">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-200" />
-                正在压缩方向…
+                {generationStages[generationStageIndex]}
               </div>
             ) : null}
           </div>
@@ -295,7 +344,9 @@ export function InputComposer() {
       <ProductIntro />
 
       <div ref={resultRef} className="mx-auto w-full max-w-6xl px-5 pb-20">
-        {result && resultInput ? (
+        {isGenerating ? (
+          <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
+        ) : result && resultInput ? (
           <ResultPanel
             result={result}
             input={resultInput}

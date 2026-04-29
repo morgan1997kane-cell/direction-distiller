@@ -1,5 +1,229 @@
 <!-- BEGIN:nextjs-agent-rules -->
 # This is NOT the Next.js you know
 
-This version has breaking changes — APIs, conventions, and file structure may all differ from your training data. Read the relevant guide in `node_modules/next/dist/docs/` before writing any code. Heed deprecation notices.
+This project uses Next.js 16.2.4 with React 19.2.4. This version has breaking changes: APIs, conventions, and file structure may differ from older Next.js knowledge. Before writing application code, read the relevant guide in `node_modules/next/dist/docs/` and heed deprecation notices.
 <!-- END:nextjs-agent-rules -->
+
+# Direction Distiller / 方向压缩器 - Agent Instructions
+
+## Project Overview
+
+Direction Distiller / 方向压缩器 是一个面向泛视觉设计师的 AI 创意方向压缩工具。
+
+它不是普通灵感笔记，也不是聊天式脑暴工具，而是帮助视觉设计师把零散灵感、模糊 brief、参考图和项目想法，快速压缩成一套可以用于提案沟通、团队脑暴和首轮视觉探索的“视觉方向包”。
+
+核心价值：
+
+把模糊灵感压缩成可提案的视觉方向。
+
+当前版本是 mock AI 原型，不接真实 AI API。
+
+## Target Users
+
+第一版服务对象是泛视觉设计师，包括：
+
+- 三维设计师
+- 平面 / 品牌视觉设计师
+- AI 视觉创作者
+- 广告概念设计师
+- 影像概念设计师
+- UI / HMI 视觉设计师
+
+## Current Product Capabilities
+
+当前原型已经实现：
+
+- 输入 brief / 灵感片段
+- 上传参考图并显示缩略图
+- 选择项目类型
+- 选择输出目标
+- 选择风格标签
+- 使用本地 mock generator 生成结果
+- 生成 3 个视觉方向候选
+- 生成 1 个推荐方向
+- 生成视觉方向包
+- 生成提案文案
+- 生成 Prompt 草稿
+- 生成下一步执行建议
+- 复制完整方向包
+- 复制 Prompt
+- 保存历史记录到 localStorage
+- 从历史记录恢复结果
+- 删除历史记录
+
+## Important Product Positioning
+
+这个产品第一版更偏“提案方向包”，不是纯 Prompt 工具。
+
+结果页应该像视觉提案卡片，而不是普通聊天记录或后台表单。
+
+页面气质应该是：
+
+- 黑底
+- 高级灰
+- 克制冷色微光
+- 创业类 AI 产品
+- 视觉设计师提案工具
+- 电影感
+- 中文为主，英文作为辅助装饰
+- 专业、清晰、有判断力
+
+不要把它做成普通 SaaS 后台，也不要做成过度霓虹或廉价毛玻璃风格。
+
+## Current Project Structure
+
+当前主要文件结构：
+
+- `src/app/page.tsx`：首页入口，只渲染 `InputComposer`
+- `src/app/layout.tsx`：根布局与 metadata
+- `src/app/globals.css`：Tailwind v4 全局样式、主题 token、系统字体栈
+- `src/components/InputComposer.tsx`：主交互容器，管理输入、生成、保存、历史恢复
+- `src/components/ResultPanel.tsx`：结果展示总面板
+- `src/components/*Card.tsx`：各类方向包、候选方向、提案文案、Prompt、执行建议卡片
+- `src/components/ImageUploader.tsx`：参考图上传与缩略图
+- `src/components/HistoryPanel.tsx`：localStorage 历史记录面板
+- `src/data/presets.ts`：项目类型、输出目标、风格标签和示例 brief
+- `src/lib/mockGenerator.ts`：本地 mock 方向生成器，不接真实 AI API
+- `src/lib/storage.ts`：localStorage 保存、读取、删除逻辑
+- `src/lib/copy.ts`：复制方向包和 Prompt 的格式化逻辑
+- `src/lib/types.ts`：产品数据结构类型定义
+
+## Deployment
+
+线上站点：
+
+https://direction-distiller.vercel.app/
+
+GitHub 仓库：
+
+https://github.com/morgan1997kane-cell/direction-distiller.git
+
+部署方式：
+
+本地修改
+→ npm run build
+→ git add .
+→ git commit
+→ git push 到 main
+→ Vercel 自动部署线上站点
+
+注意：
+
+localhost 只是本地开发预览地址。
+不要把 localhost 当成线上地址。
+完成修改后，如果需要同步线上，必须 push 到 main。
+
+## Development Commands
+
+安装依赖：
+
+```bash
+npm install
+```
+
+本地开发：
+
+```bash
+npm run dev
+```
+
+构建检查：
+
+```bash
+npm run build
+```
+
+TypeScript 检查：
+
+```bash
+npx tsc --noEmit
+```
+
+## Build Stability Notes
+
+之前项目使用 `next/font/google` 拉取 Google Fonts，导致 `npm run build` 在网络不稳定时失败。
+
+现在已经移除远程 Google Fonts 依赖，改用本地系统字体栈。
+
+不要重新引入 `next/font/google`。
+不要在构建阶段依赖 Google Fonts 等外部字体请求。
+
+当前字体栈定义在 `src/app/globals.css`，接近：
+
+```css
+Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif
+```
+
+## Current Version History
+
+已知推进记录：
+
+- v0.1：Codex 一次性生成完整 mock MVP
+- v0.2：结果页与首页优化成更像提案工具的体验
+- v0.2.1：移除 Google Fonts 远程依赖，修复 build 稳定性
+
+相关 Git 提交记录中应包含：
+
+- Initial / Create Next App 初始工程
+- Direction Distiller 初版原型
+- Proposal-style prototype polish
+- Remove remote font dependency for stable build
+
+## Do Not Do Unless Explicitly Asked
+
+不要主动做这些事情：
+
+- 不要重建整个项目
+- 不要删除已有功能
+- 不要接真实 AI API
+- 不要做登录
+- 不要做数据库
+- 不要做付费
+- 不要做团队协作
+- 不要做复杂项目管理
+- 不要做 Eagle 插件
+- 不要做 PDF 导出
+- 不要改 GitHub 远程仓库地址
+- 不要把 localhost 当作线上地址
+- 不要重新引入 Google Fonts 远程依赖
+
+## Preferred Working Style
+
+每次修改前：
+
+1. 先阅读当前项目结构
+2. 说明将修改哪些文件
+3. 保持功能不被破坏
+4. 小步修改，不要大规模重构
+5. 修改后运行 `npm run build`
+6. build 通过后再提交
+
+每次完成任务后请总结：
+
+1. 修改了哪些页面或组件
+2. 新增或修改了哪些文件
+3. 是否影响现有功能
+4. `npm run build` 是否通过
+5. 是否已经 commit
+6. 是否已经 push 到 main
+7. Vercel 是否需要等待自动部署
+
+## Current Next Product Direction
+
+当前下一步优先级：
+
+1. 先稳定现有原型
+2. 再审查线上体验
+3. 再决定是否继续做 UI 细修
+4. 再准备第一条自媒体内容
+5. 之后才考虑接真实 AI API
+6. Skill / Image 2.0 / Deep Research / Agent 模式暂时都不是当前第一优先级
+
+## Notes for Future Codex Sessions
+
+如果这是一个新 Codex 会话，请先阅读本文件，再读取当前代码。
+
+不要假设项目只是 localhost 本地项目。
+它已经部署到 Vercel，线上地址是：
+
+https://direction-distiller.vercel.app/

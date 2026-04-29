@@ -9,6 +9,7 @@ import { ImageUploader } from "@/components/ImageUploader";
 import { OptionChips } from "@/components/OptionChips";
 import { ProductIntro } from "@/components/ProductIntro";
 import { ResultPanel } from "@/components/ResultPanel";
+import { VersionBadge } from "@/components/VersionBadge";
 import { ValueFlow } from "@/components/ValueFlow";
 import { normalizeDirectionResult } from "@/lib/directionSchema";
 import { generateDirection } from "@/lib/generateDirection";
@@ -149,6 +150,7 @@ export function InputComposer() {
     <main>
       <Hero />
       <ValueFlow />
+      <VersionBadge />
 
       <section className="mx-auto grid w-full max-w-6xl gap-5 px-5 pb-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="border border-white/10 bg-white/[0.035] p-4 shadow-[0_30px_120px_rgba(0,0,0,0.35)] md:p-6">

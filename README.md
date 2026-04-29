@@ -124,6 +124,10 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 
 ## Version Notes
 
+当前可见版本号维护在 `src/lib/version.ts`。
+
+页面右下角有轻量版本角标，用于确认本地预览与 Vercel 线上部署是否同步。每次完成可见功能更新或产品阶段变化时，需要更新 `APP_VERSION`，必要时同步更新 `APP_VERSION_LABEL`。
+
 已知推进记录：
 
 - v0.1：Codex 一次性生成完整 mock MVP

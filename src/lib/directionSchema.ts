@@ -247,12 +247,14 @@ export function normalizeDirectionResult(
   result: DirectionResult,
   input: DirectionInput,
   mode: "live" | "demo",
+  provider?: string,
 ): DirectionResult {
   return {
     ...result,
     id: result.id || `result-${Date.now()}`,
     createdAt: result.createdAt || new Date().toISOString(),
     ai_mode: mode,
+    ai_provider: provider ?? result.ai_provider,
     project_type: input.projectType,
     output_goal: input.outputGoal,
     style_tags: input.styleTags.length > 0 ? input.styleTags : result.style_tags,

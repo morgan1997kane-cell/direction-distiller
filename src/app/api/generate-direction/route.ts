@@ -1,10 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
-import {
-  directionResultJsonSchema,
-  normalizeDirectionResult,
-  validateDirectionResult,
-} from "@/lib/directionSchema";
+import { getAIProviderConfig } from "@/lib/aiProvider";
+import { normalizeDirectionResult, validateDirectionResult } from "@/lib/directionSchema";
 import type { DirectionInput, ReferenceImage } from "@/lib/types";
 
 export const runtime = "nodejs";
@@ -69,23 +66,29 @@ function toDirectionInput(request: GenerateDirectionRequest): DirectionInput {
   };
 }
 
-function buildInstructions() {
+function buildSystemPrompt() {
   return [
     "你是 Direction Distiller / 方向压缩器的服务端生成器。",
     "Direction Distiller 是视觉设计师的方向压缩器，不是泛聊天脑暴工具，也不是普通 Prompt 工具。",
     "你的任务是把用户输入的 brief、风格倾向、项目类型和参考图文本信息，压缩成可用于提案沟通和首轮视觉探索的视觉方向包。",
-    "第一版只处理文本信息；参考图只能根据数量、文件名、MIME 类型做文本层面的参考摘要，不要声称你真实识别了图片内容。",
+    "第一版只处理文本信息；参考图只能根据数量、文件名、MIME 类型和 size 做文本层面的参考摘要，不要声称你真实识别了图片内容。",
     "输出要像给视觉设计师、广告概念设计师、三维设计师看的提案方向，不要像普通 ChatGPT 聊天回复。",
     "所有主要文案使用中文；英文只允许作为辅助概念词或 prompt 中出现。",
     "评分标准是：清晰度、画面可控性、提案价值、执行可行性。",
     "必须输出 3 个候选方向，type 分别且只能是：稳妥型、大胆型、执行型。",
     "稳妥型适合客户沟通、风险低、容易进入提案；大胆型更有记忆点和传播感但风险更高；执行型最容易进入实际制作，强调生产可行性。",
     "candidate_directions 必须正好 3 个；scores 四项都必须是 0-100 的整数；recommended_direction.candidate_id 必须对应其中一个候选方向 id。",
-    "不要输出 markdown，不要解释，不要包裹代码块，只返回符合 schema 的 JSON。",
+    "不要输出 markdown，不要解释，不要包裹代码块，只返回 JSON object。",
+    "JSON 必须包含这些顶层字段：id, createdAt, project_type, output_goal, input_summary, style_tags, reference_image_summary, candidate_directions, recommended_direction, direction_package, proposal_copy, prompt_package, execution_advice。",
+    "reference_image_summary 每项必须包含：image_id, file_name, observed_style, color_tone, composition_notes, usable_elements。",
+    "direction_package 必须包含：core_concept, mood, material, lighting, composition, color_palette, do_not。",
+    "proposal_copy 必须包含：short_pitch, client_facing_description, internal_direction_note。",
+    "prompt_package 必须包含：main_prompt, variation_prompts, negative_constraints。",
+    "execution_advice 必须包含：first_step, recommended_workflow, risk_warning。",
   ].join("\n");
 }
 
-function buildInput(input: DirectionInput) {
+function buildUserPrompt(input: DirectionInput) {
   return JSON.stringify(
     {
       brief: input.brief,
@@ -110,6 +113,20 @@ function safeErrorMessage(error: unknown) {
   return "Unknown generation error";
 }
 
+function extractJsonObject(text: string) {
+  const trimmed = text.trim();
+  try {
+    return JSON.parse(trimmed) as unknown;
+  } catch {
+    const start = trimmed.indexOf("{");
+    const end = trimmed.lastIndexOf("}");
+    if (start === -1 || end === -1 || end <= start) {
+      throw new Error("No JSON object found in model output");
+    }
+    return JSON.parse(trimmed.slice(start, end + 1)) as unknown;
+  }
+}
+
 export async function POST(request: Request) {
   let body: GenerateDirectionRequest;
 
@@ -125,43 +142,45 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "brief or referenceImages is required" }, { status: 400 });
   }
 
-  const apiKey = process.env.OPENAI_API_KEY;
-  if (!apiKey) {
-    return NextResponse.json({ error: "Missing OPENAI_API_KEY" }, { status: 500 });
+  const config = getAIProviderConfig();
+  if (!config.apiKey) {
+    return NextResponse.json({ error: `Missing API key for AI_PROVIDER=${config.provider}` }, { status: 500 });
   }
 
-  const model = process.env.OPENAI_MODEL || "gpt-5.5";
-  const client = new OpenAI({ apiKey, timeout: 60_000 });
+  const client = new OpenAI({
+    apiKey: config.apiKey,
+    baseURL: config.baseURL,
+    timeout: 60_000,
+  });
 
   try {
-    const response = await client.responses.create({
-      model,
-      instructions: buildInstructions(),
-      input: buildInput(input),
-      max_output_tokens: 5000,
-      text: {
-        format: {
-          type: "json_schema",
-          name: "direction_result",
-          strict: true,
-          schema: directionResultJsonSchema,
-        },
-      },
+    const completion = await client.chat.completions.create({
+      model: config.model,
+      messages: [
+        { role: "system", content: buildSystemPrompt() },
+        { role: "user", content: buildUserPrompt(input) },
+      ],
+      temperature: 0.7,
     });
 
-    if (!response.output_text) {
-      return NextResponse.json({ error: "OpenAI returned an empty response" }, { status: 502 });
+    const content = completion.choices[0]?.message?.content;
+    if (!content) {
+      return NextResponse.json({ error: `${config.provider} returned an empty response` }, { status: 502 });
     }
 
-    const parsed = JSON.parse(response.output_text) as unknown;
+    const parsed = extractJsonObject(content);
 
     if (!validateDirectionResult(parsed)) {
-      return NextResponse.json({ error: "OpenAI returned an incompatible DirectionResult" }, { status: 502 });
+      return NextResponse.json({ error: `${config.provider} returned an incompatible DirectionResult` }, { status: 502 });
     }
 
-    return NextResponse.json(normalizeDirectionResult(parsed, input, "live"));
+    return NextResponse.json(normalizeDirectionResult(parsed, input, "live", config.provider));
   } catch (error) {
-    console.error("generate-direction failed", safeErrorMessage(error));
+    console.error("generate-direction failed", {
+      provider: config.provider,
+      model: config.model,
+      message: safeErrorMessage(error),
+    });
     return NextResponse.json({ error: "Live AI generation failed" }, { status: 502 });
   }
 }

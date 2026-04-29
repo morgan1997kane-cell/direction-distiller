@@ -1,2 +1,2 @@
-export const APP_VERSION = "v0.3.0";
-export const APP_VERSION_LABEL = "Live API Ready";
+export const APP_VERSION = "v0.3.1";
+export const APP_VERSION_LABEL = "Domestic API Ready";

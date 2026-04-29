@@ -26,6 +26,7 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
                 id: `${file.name}-${file.lastModified}-${crypto.randomUUID()}`,
                 fileName: file.name,
                 type: file.type,
+                size: file.size,
                 previewUrl: String(reader.result),
               });
             };

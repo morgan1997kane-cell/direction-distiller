@@ -10,6 +10,8 @@ import { OptionChips } from "@/components/OptionChips";
 import { ProductIntro } from "@/components/ProductIntro";
 import { ResultPanel } from "@/components/ResultPanel";
 import { ValueFlow } from "@/components/ValueFlow";
+import { normalizeDirectionResult } from "@/lib/directionSchema";
+import { generateDirection } from "@/lib/generateDirection";
 import { generateDirectionResult } from "@/lib/mockGenerator";
 import {
   clearSavedResults,
@@ -47,6 +49,7 @@ export function InputComposer() {
   const [history, setHistory] = useState<SavedDirectionResult[]>([]);
   const [isGenerating, setIsGenerating] = useState(false);
   const [error, setError] = useState("");
+  const [notice, setNotice] = useState("");
   const [savedResultId, setSavedResultId] = useState("");
   const resultRef = useRef<HTMLDivElement>(null);
 
@@ -69,26 +72,36 @@ export function InputComposer() {
     setOutputGoal(example.outputGoal);
     setSelectedStyles(example.styleTags);
     setError("");
+    setNotice("");
     window.scrollTo({ top: 360, behavior: "smooth" });
   }
 
-  function runGenerate() {
+  async function runGenerate() {
     if (!brief.trim() && referenceImages.length === 0) {
       setError("请先输入一个 brief、灵感片段，或上传参考图。");
       return;
     }
 
     setError("");
+    setNotice("");
     setSavedResultId("");
     setIsGenerating(true);
     const generationInput = currentInput;
-    window.setTimeout(() => {
-      const nextResult = generateDirectionResult(generationInput);
+
+    try {
+      const nextResult = await generateDirection(generationInput);
       setResult(nextResult);
       setResultInput(generationInput);
+    } catch (generationError) {
+      console.warn("Live AI generation failed, falling back to local mock generator.", generationError);
+      const fallbackResult = normalizeDirectionResult(generateDirectionResult(generationInput), generationInput, "demo");
+      setResult(fallbackResult);
+      setResultInput(generationInput);
+      setNotice("真实 AI 暂时不可用，已使用本地演示生成结果。");
+    } finally {
       setIsGenerating(false);
       window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-    }, 1200 + Math.round(Math.random() * 700));
+    }
   }
 
   function saveCurrent() {
@@ -115,6 +128,7 @@ export function InputComposer() {
     setResult(item.result);
     setResultInput(item.input);
     setSavedResultId(item.result.id);
+    setNotice("");
     window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   }
 
@@ -128,6 +142,7 @@ export function InputComposer() {
     setResultInput(null);
     setSavedResultId("");
     setError("");
+    setNotice("");
   }
 
   return (
@@ -186,6 +201,7 @@ export function InputComposer() {
           </div>
 
           {error ? <p className="mt-5 text-sm text-red-200">{error}</p> : null}
+          {notice ? <p className="mt-5 text-sm text-amber-100/80">{notice}</p> : null}
 
           <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
             <button

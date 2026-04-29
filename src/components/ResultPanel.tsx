@@ -22,7 +22,12 @@ export function ResultPanel({ result, input, saved, onSave, onRegenerate, onClea
   return (
     <section className="space-y-6">
       <header className="border-b border-white/10 pb-5">
-        <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/50">Distilled Proposal</p>
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/50">Distilled Proposal</p>
+          <span className="border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs uppercase tracking-[0.18em] text-zinc-400">
+            AI Mode: {result.ai_mode === "live" ? "Live" : "Demo"}
+          </span>
+        </div>
         <h2 className="mt-3 text-3xl font-semibold text-zinc-50">方向压缩结果</h2>
       </header>
 

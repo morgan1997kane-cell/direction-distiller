@@ -27,6 +27,7 @@ export interface ReferenceImage {
   fileName: string;
   type: string;
   previewUrl: string;
+  size?: number;
 }
 
 export interface DirectionInput {
@@ -103,6 +104,7 @@ export interface ExecutionAdvice {
 export interface DirectionResult {
   id: string;
   createdAt: string;
+  ai_mode?: "live" | "demo";
   project_type: ProjectType;
   output_goal: OutputGoal;
   input_summary: string;

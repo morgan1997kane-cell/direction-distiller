@@ -143,6 +143,16 @@ v0.3.4 adds a clearer generation waiting state for Live API calls:
 - Demo mode uses a shorter local-generation hint.
 - Fallback notices are more specific and still keep technical details hidden.
 
+## Result Quality
+
+v0.4.1 focuses on live generation quality:
+
+- Candidate directions should be visibly different across safe, bold, and execution-oriented routes.
+- Scores should show real trade-offs instead of clustering around the same range.
+- Direction packages should use specific visual language for material, lighting, composition, color, and avoid rules.
+- Proposal copy should be more suitable for PPT use and client-facing review.
+- Prompt drafts should be directly usable, with three distinct variations and practical negative constraints.
+
 ## Local Development
 
 安装依赖：
@@ -225,6 +235,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 
 v0.3.4: generation experience upgrade with staged loading copy, result skeleton, clearer AI mode, and better fallback notices.
 v0.4.0: Local / Ollama provider support for local development, with Vercel production fallback to Demo.
+v0.4.1: result quality upgrade with stronger candidate differentiation, more professional direction packages, PPT-ready proposal copy, and more executable prompt drafts.
 
 相关 Git 提交记录中应包含：
 
@@ -239,6 +250,7 @@ v0.4.0: Local / Ollama provider support for local development, with Vercel produ
 - Normalize provider response for live AI generation
 - Improve generation experience and loading states
 - Add local Ollama provider support
+- Improve live generation result quality
 
 ## Notes for AI Coding Agents
 

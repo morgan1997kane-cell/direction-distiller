@@ -259,6 +259,15 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Vercel production cannot access a user's local `localhost:11434`; if `ollama` is selected online, the API should return a clear error and the frontend should fallback to Demo.
 - Do not add automatic model downloads, an Ollama installer, or image recognition.
 
+## Result Quality
+
+- v0.4.1 focuses on live generation result quality, not UI changes or new providers.
+- Candidate directions should be clearly differentiated: safe/client-friendly, bold/memorable, and execution-oriented.
+- Scores should show real trade-offs rather than average 75-85 values.
+- Direction packages should include concrete visual language for material, lighting, composition, color, and avoid rules.
+- Proposal copy should be PPT-ready and useful for client-facing review.
+- Prompt drafts should be executable, with three distinct variation prompts and practical negative constraints.
+
 ## Current Version History
 
 当前可见版本号维护在 `src/lib/version.ts`。
@@ -280,6 +289,7 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 
 v0.3.4: generation experience upgrade with staged loading copy, result skeleton, clearer AI mode, and better fallback notices.
 v0.4.0: Local / Ollama provider support for local development, with Vercel production fallback to Demo.
+v0.4.1: result quality upgrade with stronger candidate differentiation, more professional direction packages, PPT-ready proposal copy, and more executable prompt drafts.
 
 相关 Git 提交记录中应包含：
 
@@ -294,6 +304,7 @@ v0.4.0: Local / Ollama provider support for local development, with Vercel produ
 - Normalize provider response for live AI generation
 - Improve generation experience and loading states
 - Add local Ollama provider support
+- Improve live generation result quality
 
 ## Do Not Do Unless Explicitly Asked
 

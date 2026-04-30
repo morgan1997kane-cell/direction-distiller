@@ -1,4 +1,5 @@
 import type { DirectionInput, DirectionResult } from "@/lib/types";
+import { normalizePromptPackage } from "@/lib/promptPackage";
 
 const candidateTypes = ["稳妥型", "大胆型", "执行型"] as const;
 
@@ -260,5 +261,6 @@ export function normalizeDirectionResult(
     project_type: input.projectType,
     output_goal: input.outputGoal,
     style_tags: input.styleTags.length > 0 ? input.styleTags : result.style_tags,
+    prompt_package: normalizePromptPackage(result.prompt_package),
   };
 }

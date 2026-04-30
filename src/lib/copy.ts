@@ -1,21 +1,37 @@
 import type { DirectionResult } from "@/lib/types";
+import { ensureBilingualPromptPackage } from "@/lib/promptPackage";
 
 function list(items: string[]) {
   return items.map((item) => `- ${item}`).join("\n");
 }
 
 export function formatPromptMarkdown(result: DirectionResult) {
+  const promptPackage = ensureBilingualPromptPackage(result.prompt_package);
+
   return [
     "# Prompt 草稿",
     "",
-    "## 主 Prompt",
-    result.prompt_package.main_prompt,
+    "## 中文版",
     "",
-    "## 变体 Prompt",
-    list(result.prompt_package.variation_prompts),
+    "### 主 Prompt",
+    promptPackage.zh.main_prompt,
     "",
-    "## Negative Constraints",
-    list(result.prompt_package.negative_constraints),
+    "### 变体 Prompt",
+    list(promptPackage.zh.variation_prompts),
+    "",
+    "### Negative Constraints",
+    list(promptPackage.zh.negative_constraints),
+    "",
+    "## English Version",
+    "",
+    "### Main Prompt",
+    promptPackage.en.main_prompt,
+    "",
+    "### Variation Prompts",
+    list(promptPackage.en.variation_prompts),
+    "",
+    "### Negative Constraints",
+    list(promptPackage.en.negative_constraints),
   ].join("\n");
 }
 
@@ -30,6 +46,17 @@ export function formatDirectionMarkdown(result: DirectionResult) {
     result.recommended_direction.core_sentence,
     "",
     result.recommended_direction.reason,
+    "",
+    "## 三个候选方向",
+    ...result.candidate_directions.flatMap((candidate) => [
+      "",
+      `### ${candidate.type} · ${candidate.title}`,
+      candidate.one_line_concept,
+      `视觉关键词：${candidate.visual_keywords.join("、")}`,
+      `情绪关键词：${candidate.mood_keywords.join("、")}`,
+      `优势：${candidate.strength}`,
+      `风险：${candidate.risk}`,
+    ]),
     "",
     "## 视觉方向包",
     `核心概念：${result.direction_package.core_concept}`,

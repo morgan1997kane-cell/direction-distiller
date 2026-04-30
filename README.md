@@ -236,6 +236,7 @@ https://github.com/morgan1997kane-cell/direction-distiller.git
 v0.3.4: generation experience upgrade with staged loading copy, result skeleton, clearer AI mode, and better fallback notices.
 v0.4.0: Local / Ollama provider support for local development, with Vercel production fallback to Demo.
 v0.4.1: result quality upgrade with stronger candidate differentiation, more professional direction packages, PPT-ready proposal copy, and more executable prompt drafts.
+v0.4.2: section editing, section-level partial regeneration, and bilingual Prompt Package tabs.
 
 相关 Git 提交记录中应包含：
 
@@ -251,7 +252,17 @@ v0.4.1: result quality upgrade with stronger candidate differentiation, more pro
 - Improve generation experience and loading states
 - Add local Ollama provider support
 - Improve live generation result quality
+- Add section editing and partial regeneration
 
 ## Notes for AI Coding Agents
 
 项目根目录包含 `AGENTS.md`。新开 Codex / AI coding agent 会话时，请先阅读 `AGENTS.md`，再读取代码。
+
+## v0.4.2 Section Editing
+
+- v0.4.2 adds section-level editing, copying, and partial regeneration for generated results.
+- Editable sections: Candidate Directions, Recommended Direction, Direction Package, Proposal Copy, Prompt Package, and Execution Advice.
+- Each candidate direction card can be edited, copied, or regenerated independently.
+- Partial regeneration uses `/api/refine-section` and keeps the current provider/model context.
+- Prompt Package is displayed with bilingual tabs: Chinese and English Version.
+- Prompt Package should keep both `zh` and `en` prompt payloads; legacy flat fields remain only for compatibility with older saved results.

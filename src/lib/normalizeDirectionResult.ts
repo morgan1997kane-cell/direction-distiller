@@ -5,6 +5,7 @@ import type {
   DirectionScores,
   ReferenceImageSummary,
 } from "@/lib/types";
+import { normalizePromptPackage } from "@/lib/promptPackage";
 
 const candidateTypes = ["稳妥型", "大胆型", "执行型"] as const;
 
@@ -201,7 +202,7 @@ export function normalizeProviderDirectionResult(raw: unknown, input: DirectionI
         "首轮先验证色调、构图和主体记忆点，再推进材质与执行细化。",
       ),
     },
-    prompt_package: {
+    prompt_package: normalizePromptPackage({
       main_prompt: text(pick(promptPackage, ["main_prompt", "mainPrompt", "主prompt"]), `${recommended.title}, visual direction, proposal-ready`),
       variation_prompts: arrayOfText(pick(promptPackage, ["variation_prompts", "variationPrompts", "变化prompt"]), [
         `${recommended.title}, restrained composition`,
@@ -211,7 +212,9 @@ export function normalizeProviderDirectionResult(raw: unknown, input: DirectionI
         "avoid chaotic collage",
         "avoid unclear subject hierarchy",
       ]),
-    },
+      zh: isRecord(promptPackage.zh) ? (promptPackage.zh as never) : undefined,
+      en: isRecord(promptPackage.en) ? (promptPackage.en as never) : undefined,
+    }),
     execution_advice: {
       first_step: text(pick(advice, ["first_step", "firstStep", "第一步"]), "先用 6-9 张静帧验证方向是否成立。"),
       recommended_workflow: text(

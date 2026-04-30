@@ -268,6 +268,15 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Proposal copy should be PPT-ready and useful for client-facing review.
 - Prompt drafts should be executable, with three distinct variation prompts and practical negative constraints.
 
+## Section Editing
+
+- v0.4.2 adds section-level editing, copying, and partial regeneration.
+- Editable sections: Candidate Directions, Recommended Direction, Direction Package, Proposal Copy, Prompt Package, and Execution Advice.
+- Each candidate direction card can be edited, copied, or regenerated independently.
+- Partial regeneration uses `src/app/api/refine-section/route.ts` and should preserve the current provider/model context.
+- Prompt Package is displayed with Chinese and English tabs and should keep both `zh` and `en` prompt payloads.
+- Keep legacy flat prompt fields only for compatibility with older saved results; new output should prefer bilingual prompt payloads.
+
 ## Current Version History
 
 当前可见版本号维护在 `src/lib/version.ts`。
@@ -290,6 +299,7 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 v0.3.4: generation experience upgrade with staged loading copy, result skeleton, clearer AI mode, and better fallback notices.
 v0.4.0: Local / Ollama provider support for local development, with Vercel production fallback to Demo.
 v0.4.1: result quality upgrade with stronger candidate differentiation, more professional direction packages, PPT-ready proposal copy, and more executable prompt drafts.
+v0.4.2: section editing, section-level partial regeneration, and bilingual Prompt Package tabs.
 
 相关 Git 提交记录中应包含：
 
@@ -305,6 +315,7 @@ v0.4.1: result quality upgrade with stronger candidate differentiation, more pro
 - Improve generation experience and loading states
 - Add local Ollama provider support
 - Improve live generation result quality
+- Add section editing and partial regeneration
 
 ## Do Not Do Unless Explicitly Asked
 

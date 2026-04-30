@@ -89,10 +89,15 @@ export interface ProposalCopy {
   internal_direction_note: string;
 }
 
-export interface PromptPackage {
+export interface PromptLanguagePackage {
   main_prompt: string;
   variation_prompts: string[];
   negative_constraints: string[];
+}
+
+export interface PromptPackage extends PromptLanguagePackage {
+  zh?: PromptLanguagePackage;
+  en?: PromptLanguagePackage;
 }
 
 export interface ExecutionAdvice {

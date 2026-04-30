@@ -354,7 +354,13 @@ export function InputComposer() {
           <ResultPanel
             result={result}
             input={resultInput}
+            provider={aiProvider}
+            model={aiModel}
             saved={savedResultId === result.id}
+            onResultChange={(nextResult) => {
+              setResult(nextResult);
+              setSavedResultId("");
+            }}
             onSave={saveCurrent}
             onRegenerate={runGenerate}
             onClear={clearInput}

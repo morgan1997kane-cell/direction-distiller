@@ -6,6 +6,9 @@ import { copyText } from "@/lib/copy";
 interface EditableSectionProps<T> {
   title: string;
   label?: string;
+  description?: string;
+  summary?: React.ReactNode;
+  defaultExpanded?: boolean;
   value: T;
   copyTextValue?: string;
   isRegenerating?: boolean;
@@ -17,6 +20,9 @@ interface EditableSectionProps<T> {
 export function EditableSection<T>({
   title,
   label,
+  description,
+  summary,
+  defaultExpanded = true,
   value,
   copyTextValue,
   isRegenerating = false,
@@ -30,6 +36,7 @@ export function EditableSection<T>({
   const [instruction, setInstruction] = useState("");
   const [showInstruction, setShowInstruction] = useState(false);
   const [message, setMessage] = useState("");
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   function startEditing() {
     setDraft(serialized);
@@ -61,24 +68,34 @@ export function EditableSection<T>({
   }
 
   return (
-    <section className="border border-white/10 bg-white/[0.018] p-3 md:p-4">
-      <div className="mb-3 flex flex-col gap-3 border-b border-white/10 pb-3 md:flex-row md:items-center md:justify-between">
-        <div>
+    <section className="min-w-0 border border-white/10 bg-white/[0.018] p-4 md:p-5">
+      <div className="flex flex-col gap-3 border-b border-white/10 pb-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
           {label ? <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/40">{label}</p> : null}
-          <h3 className="mt-1 text-sm font-medium text-zinc-100">{title}</h3>
+          <h3 className="mt-1 text-lg font-semibold leading-snug text-zinc-50 md:text-xl">{title}</h3>
+          {description ? <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500">{description}</p> : null}
         </div>
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
           {message ? <span className="text-xs text-cyan-100/70">{message}</span> : null}
           <SectionButton onClick={startEditing}>Edit</SectionButton>
           <SectionButton onClick={() => setShowInstruction((current) => !current)} disabled={isRegenerating}>
             {isRegenerating ? "Regenerating" : "Regenerate"}
           </SectionButton>
           <SectionButton onClick={copySection}>Copy</SectionButton>
+          <SectionButton onClick={() => setIsExpanded((current) => !current)} ariaExpanded={isExpanded}>
+            {isExpanded ? "Collapse" : "Expand"}
+          </SectionButton>
         </div>
       </div>
 
-      {showInstruction ? (
-        <div className="mb-3 flex flex-col gap-2 border border-white/10 bg-black/30 p-3 md:flex-row">
+      {!isExpanded && !isEditing ? (
+        <div className="mt-4 border border-white/10 bg-black/25 p-3 text-sm leading-6 text-zinc-400">
+          {summary ?? <span className="text-zinc-500">已折叠，展开查看完整内容。</span>}
+        </div>
+      ) : null}
+
+      {showInstruction && isExpanded ? (
+        <div className="mt-4 flex flex-col gap-2 border border-white/10 bg-black/30 p-3 md:flex-row">
           <input
             value={instruction}
             onChange={(event) => setInstruction(event.target.value)}
@@ -97,7 +114,7 @@ export function EditableSection<T>({
       ) : null}
 
       {isEditing ? (
-        <div className="space-y-3">
+        <div className="mt-4 space-y-3">
           <textarea
             value={draft}
             onChange={(event) => setDraft(event.target.value)}
@@ -108,8 +125,51 @@ export function EditableSection<T>({
             <SectionButton onClick={() => setIsEditing(false)}>Cancel</SectionButton>
           </div>
         </div>
+      ) : isExpanded ? (
+        <div className="mt-4 min-w-0">{children}</div>
+      ) : null}
+    </section>
+  );
+}
+
+export function CollapsibleSection({
+  title,
+  label,
+  description,
+  summary,
+  defaultExpanded = true,
+  children,
+}: {
+  title: string;
+  label?: string;
+  description?: string;
+  summary?: React.ReactNode;
+  defaultExpanded?: boolean;
+  children: React.ReactNode;
+}) {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
+
+  return (
+    <section className="min-w-0 border border-white/10 bg-white/[0.018] p-4 md:p-5">
+      <div className="flex flex-col gap-3 border-b border-white/10 pb-4 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          {label ? <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/40">{label}</p> : null}
+          <h3 className="mt-1 text-lg font-semibold leading-snug text-zinc-50 md:text-xl">{title}</h3>
+          {description ? <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500">{description}</p> : null}
+        </div>
+        <div className="flex shrink-0 flex-wrap items-center gap-2">
+          <SectionButton onClick={() => setIsExpanded((current) => !current)} ariaExpanded={isExpanded}>
+            {isExpanded ? "Collapse" : "Expand"}
+          </SectionButton>
+        </div>
+      </div>
+
+      {!isExpanded ? (
+        <div className="mt-4 border border-white/10 bg-black/25 p-3 text-sm leading-6 text-zinc-400">
+          {summary ?? <span className="text-zinc-500">已折叠，展开查看完整内容。</span>}
+        </div>
       ) : (
-        children
+        <div className="mt-4 min-w-0">{children}</div>
       )}
     </section>
   );
@@ -118,10 +178,12 @@ export function EditableSection<T>({
 function SectionButton({
   children,
   disabled = false,
+  ariaExpanded,
   onClick,
 }: {
   children: React.ReactNode;
   disabled?: boolean;
+  ariaExpanded?: boolean;
   onClick: () => void;
 }) {
   return (
@@ -129,6 +191,7 @@ function SectionButton({
       type="button"
       onClick={onClick}
       disabled={disabled}
+      aria-expanded={ariaExpanded}
       className="border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs text-zinc-400 transition hover:border-cyan-200/30 hover:text-cyan-50 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}

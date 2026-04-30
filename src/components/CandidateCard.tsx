@@ -17,7 +17,7 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
   );
 
   return (
-    <article className="flex h-full flex-col border border-white/10 bg-zinc-950/80 p-4 transition hover:border-white/20 hover:bg-zinc-900/70">
+    <article className="flex min-h-0 flex-col border border-white/10 bg-zinc-950/80 p-4 transition hover:border-white/20 hover:bg-zinc-900/70">
       <div className="flex items-start justify-between gap-4">
         <span className={`border px-2.5 py-1 text-xs ${typeTone[candidate.type]}`}>{candidate.type}</span>
         <div className="border border-white/10 bg-white/[0.035] px-3 py-2 text-right">
@@ -26,7 +26,7 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
         </div>
       </div>
 
-      <h3 className="mt-5 text-xl font-medium leading-snug text-zinc-50">{candidate.title}</h3>
+      <h3 className="mt-5 text-lg font-medium leading-snug text-zinc-50">{candidate.title}</h3>
       <p className="mt-3 text-sm leading-6 text-zinc-400">{candidate.one_line_concept}</p>
 
       <div className="mt-5 space-y-4">
@@ -45,7 +45,7 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
         </p>
       </div>
 
-      <div className="mt-auto pt-5">
+      <div className="mt-5 border-t border-white/10 pt-5">
         <ScoreBars scores={candidate.scores} />
       </div>
     </article>

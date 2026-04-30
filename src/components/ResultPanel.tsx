@@ -14,15 +14,15 @@ import type {
 import type { AIProvider } from "@/lib/aiProvider";
 import { CandidateCard } from "@/components/CandidateCard";
 import { DirectionPackageCard } from "@/components/DirectionPackageCard";
-import { EditableSection } from "@/components/EditableSection";
+import { CollapsibleSection, EditableSection } from "@/components/EditableSection";
 import { ExecutionAdviceCard } from "@/components/ExecutionAdviceCard";
 import { PromptPackageCard } from "@/components/PromptPackageCard";
 import { ProposalCopyCard } from "@/components/ProposalCopyCard";
 import { RecommendedDirectionCard } from "@/components/RecommendedDirectionCard";
 import { isSupportedProvider, PROVIDER_LABELS } from "@/lib/aiProvider";
 import { copyText, formatDirectionMarkdown, formatPromptMarkdown } from "@/lib/copy";
-import { generateDirectionResult } from "@/lib/mockGenerator";
 import { normalizeDirectionResult } from "@/lib/directionSchema";
+import { generateDirectionResult } from "@/lib/mockGenerator";
 import { refineSection, type RefineSectionType } from "@/lib/refineSection";
 
 interface ResultPanelProps {
@@ -53,6 +53,10 @@ export function ResultPanel({
   const providerLabel =
     result.ai_provider && isSupportedProvider(result.ai_provider) ? PROVIDER_LABELS[result.ai_provider] : result.ai_provider;
   const liveLabel = ["Live", providerLabel, result.ai_model].filter(Boolean).join(" · ");
+
+  function short(value: string, length = 96) {
+    return value.length > length ? `${value.slice(0, length)}...` : value;
+  }
 
   function updateResult(next: Partial<DirectionResult>) {
     setNotice("");
@@ -116,7 +120,7 @@ export function ResultPanel({
   }
 
   return (
-    <section className="space-y-6">
+    <section className="space-y-8 pb-32">
       <header className="border-b border-white/10 pb-5">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/50">Distilled Proposal</p>
@@ -139,14 +143,19 @@ export function ResultPanel({
       </section>
 
       {result.reference_image_summary.length > 0 ? (
-        <section className="border border-white/10 bg-zinc-950/60 p-4">
-          <div className="flex items-center justify-between gap-4">
-            <h3 className="text-sm font-medium text-zinc-100">参考图摘要</h3>
-            <span className="text-xs text-zinc-600">Reference Notes</span>
-          </div>
-          <div className="mt-4 grid gap-3 md:grid-cols-2">
+        <CollapsibleSection
+          title="Reference Notes"
+          label="参考图摘要"
+          description="仅基于文件名、数量和 MIME 类型形成文本上下文，不做真实图片识别。"
+          summary={`${result.reference_image_summary.length} 张参考图 · ${result.reference_image_summary
+            .map((image) => image.file_name)
+            .slice(0, 2)
+            .join("、")}`}
+          defaultExpanded={false}
+        >
+          <div className="grid gap-3 md:grid-cols-2">
             {result.reference_image_summary.map((image) => (
-              <div key={image.image_id} className="border border-white/10 bg-black/25 p-3">
+              <div key={image.image_id} className="min-w-0 border border-white/10 bg-black/25 p-3">
                 <p className="truncate text-sm text-zinc-200">{image.file_name}</p>
                 <p className="mt-2 text-xs leading-5 text-zinc-500">
                   {image.observed_style} · {image.color_tone} · {image.composition_notes}
@@ -155,12 +164,15 @@ export function ResultPanel({
               </div>
             ))}
           </div>
-        </section>
+        </CollapsibleSection>
       ) : null}
 
       <EditableSection<RecommendedDirection>
         title="Recommended Direction"
         label="推荐方向"
+        description="系统推荐的主方向，适合先拿来进入提案判断。"
+        summary={short(result.recommended_direction.core_sentence)}
+        defaultExpanded
         value={result.recommended_direction}
         copyTextValue={`${result.recommended_direction.title}\n${result.recommended_direction.core_sentence}\n${result.recommended_direction.reason}`}
         isRegenerating={regeneratingKey === "recommended_direction"}
@@ -178,16 +190,21 @@ export function ResultPanel({
         <RecommendedDirectionCard recommended={result.recommended_direction} />
       </EditableSection>
 
-      <section className="space-y-4">
-        <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-zinc-600">Direction Routes</p>
-          <h2 className="mt-2 text-2xl font-semibold text-zinc-50">三个方向候选</h2>
-        </div>
-        <div className="grid gap-4 lg:grid-cols-3">
+      <CollapsibleSection
+        title="Candidate Directions"
+        label="三个方向候选"
+        description="三个候选用于比较风险、传播感和执行效率；每张卡片都可以单独编辑、复制或局部重生成。"
+        summary={`3 个候选 · ${result.candidate_directions.map((candidate) => candidate.type).join(" / ")}`}
+        defaultExpanded
+      >
+        <div className="grid items-start gap-5 lg:grid-cols-3">
           {result.candidate_directions.map((candidate, index) => (
             <EditableSection<DirectionCandidate>
               key={candidate.id}
               title={`${candidate.type} · Candidate ${index + 1}`}
+              description={short(candidate.one_line_concept, 72)}
+              summary={`${candidate.title} · ${short(candidate.one_line_concept, 70)}`}
+              defaultExpanded
               value={candidate}
               copyTextValue={copyCandidate(candidate)}
               isRegenerating={regeneratingKey === candidate.id}
@@ -218,11 +235,14 @@ export function ResultPanel({
             </EditableSection>
           ))}
         </div>
-      </section>
+      </CollapsibleSection>
 
       <EditableSection<DirectionPackage>
         title="Direction Package"
-        label="方向包"
+        label="视觉方向包"
+        description="把推荐方向整理成可执行的视觉语言，包含情绪、材质、光线、构图和禁忌项。"
+        summary={`${short(result.direction_package.core_concept)} · 展开查看材质 / 光线 / 构图 / 禁止项`}
+        defaultExpanded={false}
         value={result.direction_package}
         isRegenerating={regeneratingKey === "direction_package"}
         onSave={(direction_package) => updateResult({ direction_package })}
@@ -242,6 +262,9 @@ export function ResultPanel({
       <EditableSection<ProposalCopy>
         title="Proposal Copy"
         label="提案文案"
+        description="适合复制到提案页或团队沟通中的文字版本。"
+        summary={short(result.proposal_copy.short_pitch)}
+        defaultExpanded={false}
         value={result.proposal_copy}
         isRegenerating={regeneratingKey === "proposal_copy"}
         onSave={(proposal_copy) => updateResult({ proposal_copy })}
@@ -261,6 +284,9 @@ export function ResultPanel({
       <EditableSection<PromptPackage>
         title="Prompt Package"
         label="Prompt 草稿"
+        description="中英双版本 Prompt，用于首轮图像模型探索。"
+        summary={`中文版 / English Version · ${short(result.prompt_package.zh?.main_prompt ?? result.prompt_package.main_prompt, 72)}`}
+        defaultExpanded={false}
         value={result.prompt_package}
         copyTextValue={formatPromptMarkdown(result)}
         isRegenerating={regeneratingKey === "prompt_package"}
@@ -280,7 +306,10 @@ export function ResultPanel({
 
       <EditableSection<ExecutionAdvice>
         title="Execution Advice"
-        label="执行建议"
+        label="下一步执行建议"
+        description="下一步制作顺序、工作流和主要风险提醒。"
+        summary={short(result.execution_advice.first_step)}
+        defaultExpanded={false}
         value={result.execution_advice}
         isRegenerating={regeneratingKey === "execution_advice"}
         onSave={(execution_advice) => updateResult({ execution_advice })}
@@ -297,7 +326,7 @@ export function ResultPanel({
         <ExecutionAdviceCard advice={result.execution_advice} />
       </EditableSection>
 
-      <div className="sticky bottom-4 z-20 flex flex-wrap gap-2 border border-white/10 bg-black/85 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-md">
+      <div className="sticky bottom-4 z-20 flex max-h-32 flex-wrap gap-2 overflow-y-auto border border-white/10 bg-black/85 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-md">
         <ActionButton onClick={() => copyText(formatDirectionMarkdown(result))}>复制方向包</ActionButton>
         <ActionButton onClick={() => copyText(formatPromptMarkdown(result))}>复制 Prompt</ActionButton>
         <ActionButton onClick={onSave}>{saved ? "已保存" : "保存到历史"}</ActionButton>

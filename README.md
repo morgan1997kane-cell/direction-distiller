@@ -237,6 +237,7 @@ v0.3.4: generation experience upgrade with staged loading copy, result skeleton,
 v0.4.0: Local / Ollama provider support for local development, with Vercel production fallback to Demo.
 v0.4.1: result quality upgrade with stronger candidate differentiation, more professional direction packages, PPT-ready proposal copy, and more executable prompt drafts.
 v0.4.2: section editing, section-level partial regeneration, and bilingual Prompt Package tabs.
+v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, and safer bottom action spacing.
 
 相关 Git 提交记录中应包含：
 
@@ -253,6 +254,7 @@ v0.4.2: section editing, section-level partial regeneration, and bilingual Promp
 - Add local Ollama provider support
 - Improve live generation result quality
 - Add section editing and partial regeneration
+- Fix result layout and add collapsible sections
 
 ## Notes for AI Coding Agents
 
@@ -266,3 +268,11 @@ v0.4.2: section editing, section-level partial regeneration, and bilingual Promp
 - Partial regeneration uses `/api/refine-section` and keeps the current provider/model context.
 - Prompt Package is displayed with bilingual tabs: Chinese and English Version.
 - Prompt Package should keep both `zh` and `en` prompt payloads; legacy flat fields remain only for compatibility with older saved results.
+
+## v0.4.3 Layout Clarity
+
+- v0.4.3 fixes result-page spacing and section hierarchy after section editing was added.
+- Major result sections are collapsible and keep a compact summary when collapsed.
+- Recommended Direction and Candidate Directions are expanded by default.
+- Direction Package, Proposal Copy, Prompt Package, Execution Advice, and Reference Notes are collapsed by default.
+- Candidate score bars stay in normal document flow, and the bottom sticky action bar has extra page padding to avoid covering content.

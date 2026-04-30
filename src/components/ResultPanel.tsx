@@ -19,6 +19,14 @@ import { ExecutionAdviceCard } from "@/components/ExecutionAdviceCard";
 import { PromptPackageCard } from "@/components/PromptPackageCard";
 import { ProposalCopyCard } from "@/components/ProposalCopyCard";
 import { RecommendedDirectionCard } from "@/components/RecommendedDirectionCard";
+import {
+  CandidateEditForm,
+  DirectionPackageEditForm,
+  ExecutionAdviceEditForm,
+  PromptPackageEditForm,
+  ProposalCopyEditForm,
+  RecommendedEditForm,
+} from "@/components/SectionEditForms";
 import { isSupportedProvider, PROVIDER_LABELS } from "@/lib/aiProvider";
 import { copyText, formatDirectionMarkdown, formatPromptMarkdown } from "@/lib/copy";
 import { normalizeDirectionResult } from "@/lib/directionSchema";
@@ -119,6 +127,34 @@ export function ResultPanel({
     ].join("\n");
   }
 
+  function copyDirectionPackage(directionPackage: DirectionPackage) {
+    return [
+      `核心概念：${directionPackage.core_concept}`,
+      `情绪：${directionPackage.mood.join("、")}`,
+      `材质：${directionPackage.material.join("、")}`,
+      `光线：${directionPackage.lighting.join("、")}`,
+      `构图：${directionPackage.composition.join("、")}`,
+      `色彩：${directionPackage.color_palette.join("、")}`,
+      `避免：${directionPackage.do_not.join("、")}`,
+    ].join("\n");
+  }
+
+  function copyProposalCopy(proposalCopy: ProposalCopy) {
+    return [
+      `短 Pitch：${proposalCopy.short_pitch}`,
+      `客户可读描述：${proposalCopy.client_facing_description}`,
+      `内部执行备注：${proposalCopy.internal_direction_note}`,
+    ].join("\n\n");
+  }
+
+  function copyExecutionAdvice(advice: ExecutionAdvice) {
+    return [
+      `第一步：${advice.first_step}`,
+      `推荐工作流：${advice.recommended_workflow}`,
+      `风险提醒：${advice.risk_warning}`,
+    ].join("\n\n");
+  }
+
   return (
     <section className="space-y-8 pb-32">
       <header className="border-b border-white/10 pb-5">
@@ -177,6 +213,7 @@ export function ResultPanel({
         copyTextValue={`${result.recommended_direction.title}\n${result.recommended_direction.core_sentence}\n${result.recommended_direction.reason}`}
         isRegenerating={regeneratingKey === "recommended_direction"}
         onSave={(recommended_direction) => updateResult({ recommended_direction })}
+        renderEditor={(props) => <RecommendedEditForm {...props} />}
         onRegenerate={(instruction) =>
           regenerateSection<RecommendedDirection>(
             "recommended_direction",
@@ -197,7 +234,7 @@ export function ResultPanel({
         summary={`3 个候选 · ${result.candidate_directions.map((candidate) => candidate.type).join(" / ")}`}
         defaultExpanded
       >
-        <div className="grid items-start gap-5 lg:grid-cols-3">
+        <div className="grid items-start gap-5 lg:grid-cols-2 2xl:grid-cols-3">
           {result.candidate_directions.map((candidate, index) => (
             <EditableSection<DirectionCandidate>
               key={candidate.id}
@@ -215,6 +252,7 @@ export function ResultPanel({
                   ),
                 })
               }
+              renderEditor={(props) => <CandidateEditForm {...props} />}
               onRegenerate={(instruction) =>
                 regenerateSection<DirectionCandidate>(
                   "candidate_direction",
@@ -244,8 +282,10 @@ export function ResultPanel({
         summary={`${short(result.direction_package.core_concept)} · 展开查看材质 / 光线 / 构图 / 禁止项`}
         defaultExpanded={false}
         value={result.direction_package}
+        copyTextValue={copyDirectionPackage(result.direction_package)}
         isRegenerating={regeneratingKey === "direction_package"}
         onSave={(direction_package) => updateResult({ direction_package })}
+        renderEditor={(props) => <DirectionPackageEditForm {...props} />}
         onRegenerate={(instruction) =>
           regenerateSection<DirectionPackage>(
             "direction_package",
@@ -266,8 +306,10 @@ export function ResultPanel({
         summary={short(result.proposal_copy.short_pitch)}
         defaultExpanded={false}
         value={result.proposal_copy}
+        copyTextValue={copyProposalCopy(result.proposal_copy)}
         isRegenerating={regeneratingKey === "proposal_copy"}
         onSave={(proposal_copy) => updateResult({ proposal_copy })}
+        renderEditor={(props) => <ProposalCopyEditForm {...props} />}
         onRegenerate={(instruction) =>
           regenerateSection<ProposalCopy>(
             "proposal_copy",
@@ -291,6 +333,7 @@ export function ResultPanel({
         copyTextValue={formatPromptMarkdown(result)}
         isRegenerating={regeneratingKey === "prompt_package"}
         onSave={(prompt_package) => updateResult({ prompt_package })}
+        renderEditor={(props) => <PromptPackageEditForm {...props} />}
         onRegenerate={(instruction) =>
           regenerateSection<PromptPackage>(
             "prompt_package",
@@ -311,8 +354,10 @@ export function ResultPanel({
         summary={short(result.execution_advice.first_step)}
         defaultExpanded={false}
         value={result.execution_advice}
+        copyTextValue={copyExecutionAdvice(result.execution_advice)}
         isRegenerating={regeneratingKey === "execution_advice"}
         onSave={(execution_advice) => updateResult({ execution_advice })}
+        renderEditor={(props) => <ExecutionAdviceEditForm {...props} />}
         onRegenerate={(instruction) =>
           regenerateSection<ExecutionAdvice>(
             "execution_advice",

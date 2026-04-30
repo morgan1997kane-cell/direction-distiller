@@ -1,7 +1,13 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { copyText } from "@/lib/copy";
+
+interface EditRenderProps<T> {
+  value: T;
+  onCancel: () => void;
+  onSave: (value: T) => void;
+}
 
 interface EditableSectionProps<T> {
   title: string;
@@ -14,6 +20,7 @@ interface EditableSectionProps<T> {
   isRegenerating?: boolean;
   onSave: (value: T) => void;
   onRegenerate: (instruction: string) => Promise<void> | void;
+  renderEditor: (props: EditRenderProps<T>) => React.ReactNode;
   children: React.ReactNode;
 }
 
@@ -28,34 +35,29 @@ export function EditableSection<T>({
   isRegenerating = false,
   onSave,
   onRegenerate,
+  renderEditor,
   children,
 }: EditableSectionProps<T>) {
-  const serialized = useMemo(() => JSON.stringify(value, null, 2), [value]);
   const [isEditing, setIsEditing] = useState(false);
-  const [draft, setDraft] = useState(serialized);
   const [instruction, setInstruction] = useState("");
   const [showInstruction, setShowInstruction] = useState(false);
   const [message, setMessage] = useState("");
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   function startEditing() {
-    setDraft(serialized);
     setMessage("");
+    setIsExpanded(true);
     setIsEditing(true);
   }
 
-  function saveDraft() {
-    try {
-      onSave(JSON.parse(draft) as T);
-      setMessage("已保存");
-      setIsEditing(false);
-    } catch {
-      setMessage("JSON 格式有误，请检查后再保存。");
-    }
+  function saveEdit(nextValue: T) {
+    onSave(nextValue);
+    setMessage("已保存");
+    setIsEditing(false);
   }
 
   async function copySection() {
-    await copyText(copyTextValue ?? serialized);
+    await copyText(copyTextValue ?? "");
     setMessage("已复制");
     window.setTimeout(() => setMessage(""), 1200);
   }
@@ -114,16 +116,12 @@ export function EditableSection<T>({
       ) : null}
 
       {isEditing ? (
-        <div className="mt-4 space-y-3">
-          <textarea
-            value={draft}
-            onChange={(event) => setDraft(event.target.value)}
-            className="min-h-64 w-full resize-y border border-white/10 bg-black/45 p-3 font-mono text-xs leading-6 text-zinc-200 outline-none focus:border-cyan-200/30"
-          />
-          <div className="flex flex-wrap gap-2">
-            <SectionButton onClick={saveDraft}>Save</SectionButton>
-            <SectionButton onClick={() => setIsEditing(false)}>Cancel</SectionButton>
-          </div>
+        <div className="mt-4">
+          {renderEditor({
+            value,
+            onCancel: () => setIsEditing(false),
+            onSave: saveEdit,
+          })}
         </div>
       ) : isExpanded ? (
         <div className="mt-4 min-w-0">{children}</div>

@@ -238,6 +238,7 @@ v0.4.0: Local / Ollama provider support for local development, with Vercel produ
 v0.4.1: result quality upgrade with stronger candidate differentiation, more professional direction packages, PPT-ready proposal copy, and more executable prompt drafts.
 v0.4.2: section editing, section-level partial regeneration, and bilingual Prompt Package tabs.
 v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, and safer bottom action spacing.
+v0.4.3.1: candidate layout and structured edit UX hotfix.
 
 相关 Git 提交记录中应包含：
 
@@ -255,6 +256,7 @@ v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, 
 - Improve live generation result quality
 - Add section editing and partial regeneration
 - Fix result layout and add collapsible sections
+- Fix candidate layout and structured edit UX
 
 ## Notes for AI Coding Agents
 
@@ -276,3 +278,10 @@ v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, 
 - Recommended Direction and Candidate Directions are expanded by default.
 - Direction Package, Proposal Copy, Prompt Package, Execution Advice, and Reference Notes are collapsed by default.
 - Candidate score bars stay in normal document flow, and the bottom sticky action bar has extra page padding to avoid covering content.
+
+## v0.4.3.1 Edit UX Hotfix
+
+- v0.4.3.1 fixes candidate card readability by using wider responsive columns and normal horizontal Chinese text flow.
+- User-facing edit mode now uses structured fields instead of raw JSON.
+- Candidate, Recommended Direction, Direction Package, Proposal Copy, Prompt Package, and Execution Advice all support field-based editing.
+- Prompt Package editing keeps Chinese and English prompt versions editable separately.

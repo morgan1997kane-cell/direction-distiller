@@ -285,6 +285,8 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Direction Package, Proposal Copy, Prompt Package, Execution Advice, and Reference Notes should default to collapsed to reduce reading pressure.
 - Candidate cards must stay in normal document flow; score bars should not use absolute positioning or overlap following sections.
 - Sticky bottom actions require enough page padding so they do not cover the last result section.
+- v0.4.3.1 hotfix keeps candidate cards readable with wider responsive columns and replaces raw JSON editing with structured text fields.
+- User-facing edit mode should not expose raw JSON/object source.
 
 ## Current Version History
 
@@ -310,6 +312,7 @@ v0.4.0: Local / Ollama provider support for local development, with Vercel produ
 v0.4.1: result quality upgrade with stronger candidate differentiation, more professional direction packages, PPT-ready proposal copy, and more executable prompt drafts.
 v0.4.2: section editing, section-level partial regeneration, and bilingual Prompt Package tabs.
 v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, and safer bottom action spacing.
+v0.4.3.1: candidate layout and structured edit UX hotfix.
 
 相关 Git 提交记录中应包含：
 
@@ -327,6 +330,7 @@ v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, 
 - Improve live generation result quality
 - Add section editing and partial regeneration
 - Fix result layout and add collapsible sections
+- Fix candidate layout and structured edit UX
 
 ## Do Not Do Unless Explicitly Asked
 

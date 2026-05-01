@@ -20,6 +20,17 @@ const scoresSchema = {
   required: ["clarity", "visual_control", "proposal_value", "execution_feasibility"],
 };
 
+const promptLanguagePackageSchema = {
+  type: "object",
+  additionalProperties: false,
+  properties: {
+    main_prompt: { type: "string" },
+    variation_prompts: stringArraySchema,
+    negative_constraints: stringArraySchema,
+  },
+  required: ["main_prompt", "variation_prompts", "negative_constraints"],
+};
+
 export const directionResultJsonSchema = {
   type: "object",
   additionalProperties: false,
@@ -124,6 +135,8 @@ export const directionResultJsonSchema = {
         main_prompt: { type: "string" },
         variation_prompts: stringArraySchema,
         negative_constraints: stringArraySchema,
+        zh: promptLanguagePackageSchema,
+        en: promptLanguagePackageSchema,
       },
       required: ["main_prompt", "variation_prompts", "negative_constraints"],
     },
@@ -169,6 +182,121 @@ function isScore(value: unknown) {
 
 function hasString(record: Record<string, unknown>, key: string) {
   return typeof record[key] === "string" && String(record[key]).trim().length > 0;
+}
+
+function describePromptLanguageIssues(value: unknown, prefix: string) {
+  const issues: string[] = [];
+  if (!isRecord(value)) return [`missing ${prefix}`];
+  if (!hasString(value, "main_prompt")) issues.push(`missing ${prefix}.main_prompt`);
+  if (!isStringArray(value.variation_prompts)) issues.push(`missing ${prefix}.variation_prompts`);
+  if (!isStringArray(value.negative_constraints)) issues.push(`missing ${prefix}.negative_constraints`);
+  return issues;
+}
+
+export function describeDirectionResultIssues(value: unknown): string[] {
+  const issues: string[] = [];
+
+  if (!isRecord(value)) return ["result is not an object"];
+
+  for (const key of ["id", "createdAt", "project_type", "output_goal", "input_summary"]) {
+    if (!hasString(value, key)) issues.push(`missing ${key}`);
+  }
+
+  if (!isStringArray(value.style_tags)) issues.push("missing style_tags");
+  if (!Array.isArray(value.reference_image_summary)) issues.push("missing reference_image_summary");
+
+  if (!Array.isArray(value.candidate_directions)) {
+    issues.push("missing candidate_directions");
+  } else {
+    if (value.candidate_directions.length !== 3) issues.push("candidate_directions length invalid");
+    const seenTypes = new Set<string>();
+    const candidateIds = new Set<string>();
+
+    value.candidate_directions.forEach((item, index) => {
+      const prefix = `candidate_directions[${index}]`;
+      if (!isRecord(item)) {
+        issues.push(`${prefix} is not an object`);
+        return;
+      }
+
+      if (!candidateTypes.includes(item.type as (typeof candidateTypes)[number])) {
+        issues.push(`${prefix}.type invalid`);
+      } else {
+        seenTypes.add(String(item.type));
+      }
+
+      if (hasString(item, "id")) candidateIds.add(String(item.id));
+      for (const key of ["id", "title", "one_line_concept", "strength", "risk"]) {
+        if (!hasString(item, key)) issues.push(`missing ${prefix}.${key}`);
+      }
+      if (!isStringArray(item.visual_keywords)) issues.push(`missing ${prefix}.visual_keywords`);
+      if (!isStringArray(item.mood_keywords)) issues.push(`missing ${prefix}.mood_keywords`);
+      if (!isRecord(item.scores)) {
+        issues.push(`missing ${prefix}.scores`);
+      } else {
+        for (const key of ["clarity", "visual_control", "proposal_value", "execution_feasibility"]) {
+          if (!isScore(item.scores[key])) issues.push(`missing ${prefix}.scores.${key}`);
+        }
+      }
+    });
+
+    for (const type of candidateTypes) {
+      if (!seenTypes.has(type)) issues.push(`missing candidate type ${type}`);
+    }
+
+    const recommended = value.recommended_direction;
+    if (!isRecord(recommended)) {
+      issues.push("missing recommended_direction");
+    } else {
+      for (const key of ["candidate_id", "title", "reason", "core_sentence"]) {
+        if (!hasString(recommended, key)) issues.push(`missing recommended_direction.${key}`);
+      }
+      if (hasString(recommended, "candidate_id") && !candidateIds.has(String(recommended.candidate_id))) {
+        issues.push("recommended_direction candidate_id invalid");
+      }
+    }
+  }
+
+  const directionPackage = value.direction_package;
+  if (!isRecord(directionPackage)) {
+    issues.push("missing direction_package");
+  } else {
+    if (!hasString(directionPackage, "core_concept")) issues.push("missing direction_package.core_concept");
+    for (const key of ["mood", "material", "lighting", "composition", "color_palette", "do_not"]) {
+      if (!isStringArray(directionPackage[key])) issues.push(`missing direction_package.${key}`);
+    }
+  }
+
+  const proposalCopy = value.proposal_copy;
+  if (!isRecord(proposalCopy)) {
+    issues.push("missing proposal_copy");
+  } else {
+    for (const key of ["short_pitch", "client_facing_description", "internal_direction_note"]) {
+      if (!hasString(proposalCopy, key)) issues.push(`missing proposal_copy.${key}`);
+    }
+  }
+
+  const promptPackage = value.prompt_package;
+  if (!isRecord(promptPackage)) {
+    issues.push("missing prompt_package");
+  } else {
+    if (!hasString(promptPackage, "main_prompt")) issues.push("missing prompt_package.main_prompt");
+    if (!isStringArray(promptPackage.variation_prompts)) issues.push("missing prompt_package.variation_prompts");
+    if (!isStringArray(promptPackage.negative_constraints)) issues.push("missing prompt_package.negative_constraints");
+    issues.push(...describePromptLanguageIssues(promptPackage.zh, "prompt_package.zh"));
+    issues.push(...describePromptLanguageIssues(promptPackage.en, "prompt_package.en"));
+  }
+
+  const advice = value.execution_advice;
+  if (!isRecord(advice)) {
+    issues.push("missing execution_advice");
+  } else {
+    for (const key of ["first_step", "recommended_workflow", "risk_warning"]) {
+      if (!hasString(advice, key)) issues.push(`missing execution_advice.${key}`);
+    }
+  }
+
+  return issues;
 }
 
 export function validateDirectionResult(value: unknown): value is DirectionResult {

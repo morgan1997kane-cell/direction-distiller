@@ -37,16 +37,25 @@ export async function generateDirection(input: DirectionInput, options: Generate
     });
 
     if (!response.ok) {
-      const message = await response.text();
+      const rawMessage = await response.text();
+      let message = rawMessage;
+      try {
+        const payload = JSON.parse(rawMessage) as { error?: unknown; detail?: unknown };
+        const detail = Array.isArray(payload.detail) ? `: ${payload.detail.join(", ")}` : "";
+        message = typeof payload.error === "string" ? `${payload.error}${detail}` : "";
+      } catch {
+        message = rawMessage;
+      }
       throw new Error(message || `Request failed with ${response.status}`);
     }
 
     const data = (await response.json()) as unknown;
-    if (!validateDirectionResult(data)) {
+    const normalized = normalizeDirectionResult(data as DirectionResult, input, "live", options.provider, options.model);
+    if (!validateDirectionResult(normalized)) {
       throw new Error("Live API returned an incompatible DirectionResult");
     }
 
-    return normalizeDirectionResult(data, input, "live", options.provider, options.model);
+    return normalized;
   } finally {
     window.clearTimeout(timer);
   }

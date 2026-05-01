@@ -240,6 +240,7 @@ v0.4.2: section editing, section-level partial regeneration, and bilingual Promp
 v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, and safer bottom action spacing.
 v0.4.3.1: candidate layout and structured edit UX hotfix.
 v0.4.3.2: current draft autosave and refresh recovery.
+v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package and provider normalization.
 
 相关 Git 提交记录中应包含：
 
@@ -295,3 +296,9 @@ v0.4.3.2: current draft autosave and refresh recovery.
 - Full generation, Demo fallback, section edits, partial regeneration, and input/provider/model changes update the current draft.
 - Refreshing the page shows a restore/discard prompt when an autosaved draft exists.
 - Reference images are stored only as metadata in the draft, never as binary/base64 image data.
+
+## v0.4.3.3 Live Response Hotfix
+
+- v0.4.3.3 makes live provider responses more tolerant of older or partial `DirectionResult` shapes.
+- Legacy flat `prompt_package` payloads are normalized into bilingual `zh` / `en` prompt packages.
+- Provider responses with common aliases are mapped before validation, and server logs now report specific missing fields.

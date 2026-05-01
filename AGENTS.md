@@ -322,6 +322,7 @@ v0.4.2: section editing, section-level partial regeneration, and bilingual Promp
 v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, and safer bottom action spacing.
 v0.4.3.1: candidate layout and structured edit UX hotfix.
 v0.4.3.2: current draft autosave and refresh recovery.
+v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package normalization and clearer provider diagnostics.
 
 相关 Git 提交记录中应包含：
 
@@ -341,6 +342,7 @@ v0.4.3.2: current draft autosave and refresh recovery.
 - Fix result layout and add collapsible sections
 - Fix candidate layout and structured edit UX
 - Add autosave and draft recovery
+- Fix live response normalization compatibility
 
 ## Do Not Do Unless Explicitly Asked
 

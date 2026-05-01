@@ -54,7 +54,7 @@ function normalizeScores(value: unknown, index: number): DirectionScores {
 
   return {
     clarity: score(pick(record, ["clarity", "清晰度"]), base),
-    visual_control: score(pick(record, ["visual_control", "visualControl", "画面可控性", "可控性"]), base - 2),
+    visual_control: score(pick(record, ["visual_control", "visualControl", "controllability", "control", "画面可控性", "可控性"]), base - 2),
     proposal_value: score(pick(record, ["proposal_value", "proposalValue", "提案价值"]), base + 2),
     execution_feasibility: score(
       pick(record, ["execution_feasibility", "executionFeasibility", "执行可行性", "可行性"]),
@@ -92,15 +92,15 @@ function normalizeCandidate(value: unknown, type: (typeof candidateTypes)[number
     type,
     title: text(pick(record, ["title", "name", "方向名称", "标题"]), fallback.title),
     one_line_concept: text(
-      pick(record, ["one_line_concept", "oneLineConcept", "concept", "一句话概念", "概念"]),
+      pick(record, ["one_line_concept", "oneLineConcept", "concept", "description", "core_concept", "coreConcept", "一句话概念", "概念"]),
       fallback.one_line_concept,
     ),
     visual_keywords: arrayOfText(
-      pick(record, ["visual_keywords", "visualKeywords", "视觉关键词", "画面关键词"]),
+      pick(record, ["visual_keywords", "visualKeywords", "key_elements", "keyElements", "elements", "visual_elements", "视觉关键词", "画面关键词"]),
       fallback.visual_keywords,
     ),
     mood_keywords: arrayOfText(
-      pick(record, ["mood_keywords", "moodKeywords", "情绪关键词", "氛围关键词"]),
+      pick(record, ["mood_keywords", "moodKeywords", "mood", "tone", "atmosphere", "情绪关键词", "氛围关键词"]),
       fallback.mood_keywords,
     ),
     strength: text(pick(record, ["strength", "优势", "亮点"]), fallback.strength),
@@ -154,8 +154,8 @@ export function normalizeProviderDirectionResult(raw: unknown, input: DirectionI
 
   const candidates = normalizeCandidates(pick(raw, ["candidate_directions", "candidates", "候选方向"]));
   const directionPackage = section(raw, ["direction_package", "package", "directionPackage", "方向包"]);
-  const proposalCopy = section(raw, ["proposal_copy", "proposal", "proposalCopy", "提案文案"]);
-  const promptPackage = section(raw, ["prompt_package", "prompts", "promptPackage", "Prompt包"]);
+  const proposalCopy = section(raw, ["proposal_copy", "proposal", "copy", "pitch", "proposalCopy", "提案文案"]);
+  const promptPackage = section(raw, ["prompt_package", "prompts", "prompt", "prompt_draft", "promptPackage", "Prompt包"]);
   const advice = section(raw, ["execution_advice", "advice", "executionAdvice", "执行建议"]);
   const recommendation = section(raw, ["recommended_direction", "recommendation", "recommendedDirection", "推荐方向"]);
   const recommendedId = text(pick(recommendation, ["candidate_id", "candidateId", "id"]), candidates[0].id);
@@ -192,7 +192,7 @@ export function normalizeProviderDirectionResult(raw: unknown, input: DirectionI
       do_not: arrayOfText(pick(directionPackage, ["do_not", "doNot", "avoid", "避免"]), ["不要堆砌所有参考元素", "避免主视觉层级失焦"]),
     },
     proposal_copy: {
-      short_pitch: text(pick(proposalCopy, ["short_pitch", "shortPitch", "短pitch"]), recommended.title),
+      short_pitch: text(pick(proposalCopy, ["short_pitch", "shortPitch", "pitch", "headline", "title", "短pitch"]), recommended.title),
       client_facing_description: text(
         pick(proposalCopy, ["client_facing_description", "clientFacingDescription", "客户描述"]),
         "这套方向将零散灵感整理为可提案、可讨论、可延展的视觉系统。",

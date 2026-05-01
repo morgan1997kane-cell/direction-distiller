@@ -1,7 +1,7 @@
 import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { getAIProviderConfig, isSupportedModel, isSupportedProvider, normalizeProvider } from "@/lib/aiProvider";
-import { normalizeDirectionResult, validateDirectionResult } from "@/lib/directionSchema";
+import { describeDirectionResultIssues, normalizeDirectionResult, validateDirectionResult } from "@/lib/directionSchema";
 import { extractJsonFromText } from "@/lib/extractJsonFromText";
 import { normalizeProviderDirectionResult } from "@/lib/normalizeDirectionResult";
 import type { DirectionInput, ReferenceImage } from "@/lib/types";
@@ -143,6 +143,16 @@ function safeErrorMessage(error: unknown) {
   return "Unknown generation error";
 }
 
+function objectKeys(value: unknown) {
+  return isRecord(value) ? Object.keys(value).slice(0, 30) : [];
+}
+
+function promptPackageKeys(value: unknown) {
+  if (!isRecord(value)) return [];
+  const promptPackage = value.prompt_package ?? value.prompts ?? value.promptPackage ?? value.prompt;
+  return isRecord(promptPackage) ? Object.keys(promptPackage).slice(0, 30) : [];
+}
+
 function isVercelProduction() {
   return process.env.VERCEL === "1" && process.env.VERCEL_ENV === "production";
 }
@@ -272,6 +282,8 @@ export async function POST(request: Request) {
         provider: config.provider,
         model: config.model,
         length: jsonText.length,
+        topLevelKeys: objectKeys(parsed),
+        promptPackageKeys: promptPackageKeys(parsed),
       });
     } catch (error) {
       console.error("generate-direction json extraction failed", {
@@ -288,24 +300,37 @@ export async function POST(request: Request) {
         provider: config.provider,
         model: config.model,
         reason: "normalizeProviderDirectionResult returned null",
+        parsedKeys: objectKeys(parsed),
       });
       return NextResponse.json({ error: `${config.provider} returned an unrecoverable DirectionResult` }, { status: 502 });
     }
 
     const result = normalizeDirectionResult(normalized, input, "live", config.provider, config.model);
+    const validationIssues = describeDirectionResultIssues(result);
 
-    if (!validateDirectionResult(result)) {
+    if (validationIssues.length > 0 || !validateDirectionResult(result)) {
       console.error("generate-direction validation failed after normalization", {
         provider: config.provider,
         model: config.model,
+        issues: validationIssues.length > 0 ? validationIssues : ["validateDirectionResult returned false"],
+        normalizedKeys: objectKeys(result),
+        candidateCount: Array.isArray(result.candidate_directions) ? result.candidate_directions.length : "invalid",
+        promptPackageKeys: objectKeys(result.prompt_package),
       });
-      return NextResponse.json({ error: `${config.provider} returned an incompatible DirectionResult` }, { status: 502 });
+      return NextResponse.json(
+        {
+          error: "Live AI response incompatible with current DirectionResult",
+          detail: validationIssues.length > 0 ? validationIssues : ["validateDirectionResult returned false"],
+        },
+        { status: 502 },
+      );
     }
 
     console.log("generate-direction normalization succeeded", {
       provider: config.provider,
       model: config.model,
       candidates: result.candidate_directions.length,
+      promptPackageKeys: objectKeys(result.prompt_package),
     });
 
     return NextResponse.json(result);

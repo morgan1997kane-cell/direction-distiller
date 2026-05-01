@@ -288,6 +288,14 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - v0.4.3.1 hotfix keeps candidate cards readable with wider responsive columns and replaces raw JSON editing with structured text fields.
 - User-facing edit mode should not expose raw JSON/object source.
 
+## Autosave And Recovery
+
+- v0.4.3.2 adds a single current draft autosave in localStorage.
+- Current draft is separate from user-saved history; history remains explicit and multi-item.
+- Full generation, Demo fallback, section edits, partial regeneration, and input/provider/model changes should update the current draft.
+- Do not store image binary data in localStorage; only keep reference image metadata.
+- On page load, show a lightweight restore/discard prompt instead of automatically overwriting the current screen.
+
 ## Current Version History
 
 当前可见版本号维护在 `src/lib/version.ts`。
@@ -313,6 +321,7 @@ v0.4.1: result quality upgrade with stronger candidate differentiation, more pro
 v0.4.2: section editing, section-level partial regeneration, and bilingual Prompt Package tabs.
 v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, and safer bottom action spacing.
 v0.4.3.1: candidate layout and structured edit UX hotfix.
+v0.4.3.2: current draft autosave and refresh recovery.
 
 相关 Git 提交记录中应包含：
 
@@ -331,6 +340,7 @@ v0.4.3.1: candidate layout and structured edit UX hotfix.
 - Add section editing and partial regeneration
 - Fix result layout and add collapsible sections
 - Fix candidate layout and structured edit UX
+- Add autosave and draft recovery
 
 ## Do Not Do Unless Explicitly Asked
 

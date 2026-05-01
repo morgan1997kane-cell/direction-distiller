@@ -135,6 +135,29 @@ export interface SavedDirectionResult {
   result: DirectionResult;
 }
 
+export interface CurrentDraftInputState {
+  brief: string;
+  referenceImages: ReferenceImage[];
+  projectType: ProjectType;
+  outputGoal: OutputGoal;
+  styleTags: StyleTag[];
+}
+
+export interface CurrentDraft {
+  id: string;
+  type: "current_draft";
+  result: DirectionResult;
+  inputState: CurrentDraftInputState;
+  aiMeta: {
+    mode: "live" | "demo";
+    provider?: string;
+    model?: string;
+    fallbackReason?: string;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+
 export interface ExamplePrompt {
   title: string;
   brief: string;

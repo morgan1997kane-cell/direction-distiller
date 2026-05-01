@@ -24,14 +24,21 @@ import { normalizeDirectionResult } from "@/lib/directionSchema";
 import { generateDirection } from "@/lib/generateDirection";
 import { generateDirectionResult } from "@/lib/mockGenerator";
 import {
+  clearCurrentDraft,
   clearSavedResults,
   deleteSavedResult,
   getSavedResults,
+  loadCurrentDraft,
   saveDirectionResult,
+  saveAutosaveSnapshot,
+  updateCurrentDraftAiMeta,
+  updateCurrentDraftInput,
+  updateCurrentDraftResult,
 } from "@/lib/storage";
 import type {
   DirectionInput,
   DirectionResult,
+  CurrentDraft,
   ExamplePrompt,
   OutputGoal,
   ProjectType,
@@ -85,6 +92,14 @@ function getFallbackNotice(error: unknown) {
   return "\u8bf7\u6c42\u5931\u8d25\uff0c\u8bf7\u7a0d\u540e\u91cd\u8bd5\uff1b\u5f53\u524d\u5df2\u4f7f\u7528 Demo \u7ed3\u679c\u3002";
 }
 
+function formatAutosaveTime(value: string) {
+  try {
+    return new Intl.DateTimeFormat("zh-CN", { hour: "2-digit", minute: "2-digit" }).format(new Date(value));
+  } catch {
+    return "";
+  }
+}
+
 export function InputComposer() {
   const [brief, setBrief] = useState(defaultInput.brief);
   const [referenceImages, setReferenceImages] = useState<ReferenceImage[]>([]);
@@ -98,6 +113,8 @@ export function InputComposer() {
   const [generationStageIndex, setGenerationStageIndex] = useState(0);
   const [error, setError] = useState("");
   const [notice, setNotice] = useState("");
+  const [draftToRecover, setDraftToRecover] = useState<CurrentDraft | null>(null);
+  const [autosavedAt, setAutosavedAt] = useState("");
   const [aiProvider, setAiProvider] = useState<AIProvider>(defaultAIProvider);
   const [aiModel, setAiModel] = useState<string>(getDefaultModel(defaultAIProvider));
   const [savedResultId, setSavedResultId] = useState("");
@@ -114,6 +131,11 @@ export function InputComposer() {
   useEffect(() => {
     const timer = window.setTimeout(() => {
       setHistory(getSavedResults());
+      const draft = loadCurrentDraft();
+      if (draft) {
+        setDraftToRecover(draft);
+        setAutosavedAt(draft.updatedAt);
+      }
 
       try {
         const raw = window.localStorage.getItem(AI_SETTINGS_KEY);
@@ -142,8 +164,27 @@ export function InputComposer() {
     return () => window.clearInterval(interval);
   }, [isGenerating]);
 
+  useEffect(() => {
+    if (!result) return;
+    setResultInput(currentInput);
+    const draft = updateCurrentDraftInput(currentInput);
+    if (draft) setAutosavedAt(draft.updatedAt);
+  }, [brief, referenceImages, projectType, outputGoal, selectedStyles, result]);
+
+  useEffect(() => {
+    if (!result) return;
+    const draft = updateCurrentDraftAiMeta({ provider: aiProvider, model: aiModel });
+    if (draft) setAutosavedAt(draft.updatedAt);
+  }, [aiProvider, aiModel, result]);
+
   function persistAISettings(provider: AIProvider, model: string) {
     window.localStorage.setItem(AI_SETTINGS_KEY, JSON.stringify({ provider, model }));
+  }
+
+  function autosaveResult(nextResult: DirectionResult, input: DirectionInput, fallbackReason?: string) {
+    const draft = saveAutosaveSnapshot(nextResult, input, { fallbackReason });
+    setAutosavedAt(draft.updatedAt);
+    setDraftToRecover(null);
   }
 
   function updateAIProvider(provider: AIProvider) {
@@ -190,18 +231,22 @@ export function InputComposer() {
         const demoResult = normalizeDirectionResult(generateDirectionResult(generationInput), generationInput, "demo");
         setResult(demoResult);
         setResultInput(generationInput);
+        autosaveResult(demoResult, generationInput);
         return;
       }
 
       const nextResult = await generateDirection(generationInput, { provider: aiProvider, model: aiModel });
       setResult(nextResult);
       setResultInput(generationInput);
+      autosaveResult(nextResult, generationInput);
     } catch (generationError) {
       console.warn("Live AI generation failed, falling back to local mock generator.", generationError);
       const fallbackResult = normalizeDirectionResult(generateDirectionResult(generationInput), generationInput, "demo");
       setResult(fallbackResult);
       setResultInput(generationInput);
-      setNotice(getFallbackNotice(generationError));
+      const fallbackNotice = getFallbackNotice(generationError);
+      autosaveResult(fallbackResult, generationInput, fallbackNotice);
+      setNotice(`${fallbackNotice} 当前 Demo 结果已自动保存，可稍后恢复。`);
     } finally {
       setIsGenerating(false);
       window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
@@ -221,6 +266,7 @@ export function InputComposer() {
     };
     setHistory(saveDirectionResult(item));
     setSavedResultId(result.id);
+    autosaveResult(result, resultInput);
   }
 
   function restoreHistory(item: SavedDirectionResult) {
@@ -232,8 +278,30 @@ export function InputComposer() {
     setResult(item.result);
     setResultInput(item.input);
     setSavedResultId(item.result.id);
+    autosaveResult(item.result, item.input);
     setNotice("");
     window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  }
+
+  function restoreCurrentDraft(draft: CurrentDraft) {
+    setBrief(draft.inputState.brief);
+    setReferenceImages(draft.inputState.referenceImages);
+    setProjectType(draft.inputState.projectType);
+    setOutputGoal(draft.inputState.outputGoal);
+    setSelectedStyles(draft.inputState.styleTags);
+    setResult(draft.result);
+    setResultInput(draft.inputState);
+    setSavedResultId("");
+    setDraftToRecover(null);
+    setAutosavedAt(draft.updatedAt);
+    setNotice("已恢复上次自动保存的生成结果。");
+    window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+  }
+
+  function discardCurrentDraft() {
+    clearCurrentDraft();
+    setDraftToRecover(null);
+    setAutosavedAt("");
   }
 
   function clearInput() {
@@ -247,6 +315,7 @@ export function InputComposer() {
     setSavedResultId("");
     setError("");
     setNotice("");
+    discardCurrentDraft();
   }
 
   return (
@@ -254,6 +323,35 @@ export function InputComposer() {
       <Hero />
       <ValueFlow />
       <VersionBadge />
+
+      {draftToRecover ? (
+        <section className="mx-auto mb-5 w-full max-w-6xl px-5">
+          <div className="flex flex-col gap-3 border border-cyan-200/20 bg-cyan-300/[0.06] p-4 md:flex-row md:items-center md:justify-between">
+            <div>
+              <p className="text-sm text-cyan-50">检测到上次未保存的生成结果，是否恢复？</p>
+              <p className="mt-1 text-xs text-zinc-500">
+                上次自动保存于 {formatAutosaveTime(draftToRecover.updatedAt) || draftToRecover.updatedAt}
+              </p>
+            </div>
+            <div className="flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => restoreCurrentDraft(draftToRecover)}
+                className="border border-cyan-200/30 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-50 transition hover:bg-cyan-300/15"
+              >
+                恢复上次结果
+              </button>
+              <button
+                type="button"
+                onClick={discardCurrentDraft}
+                className="border border-white/10 px-4 py-2 text-sm text-zinc-400 transition hover:text-zinc-100"
+              >
+                丢弃
+              </button>
+            </div>
+          </div>
+        </section>
+      ) : null}
 
       <section className="mx-auto grid w-full max-w-6xl gap-5 px-5 pb-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="border border-white/10 bg-white/[0.035] p-4 shadow-[0_30px_120px_rgba(0,0,0,0.35)] md:p-6">
@@ -313,6 +411,16 @@ export function InputComposer() {
 
           {error ? <p className="mt-5 text-sm text-red-200">{error}</p> : null}
           {notice ? <p className="mt-5 text-sm text-amber-100/80">{notice}</p> : null}
+          {autosavedAt ? (
+            <p className="mt-4 text-xs text-zinc-500">
+              已自动保存 · 上次保存于 {formatAutosaveTime(autosavedAt) || autosavedAt}
+              {result?.ai_mode === "live"
+                ? ` · 当前结果来自 Live${result.ai_provider ? ` · ${result.ai_provider}` : ""}${result.ai_model ? ` · ${result.ai_model}` : ""}`
+                : result
+                  ? " · 当前结果来自 Demo"
+                  : ""}
+            </p>
+          ) : null}
 
           <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
             <button
@@ -360,6 +468,8 @@ export function InputComposer() {
             onResultChange={(nextResult) => {
               setResult(nextResult);
               setSavedResultId("");
+              const draft = updateCurrentDraftResult(nextResult);
+              if (draft) setAutosavedAt(draft.updatedAt);
             }}
             onSave={saveCurrent}
             onRegenerate={runGenerate}

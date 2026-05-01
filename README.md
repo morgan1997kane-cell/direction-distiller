@@ -239,6 +239,7 @@ v0.4.1: result quality upgrade with stronger candidate differentiation, more pro
 v0.4.2: section editing, section-level partial regeneration, and bilingual Prompt Package tabs.
 v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, and safer bottom action spacing.
 v0.4.3.1: candidate layout and structured edit UX hotfix.
+v0.4.3.2: current draft autosave and refresh recovery.
 
 相关 Git 提交记录中应包含：
 
@@ -257,6 +258,7 @@ v0.4.3.1: candidate layout and structured edit UX hotfix.
 - Add section editing and partial regeneration
 - Fix result layout and add collapsible sections
 - Fix candidate layout and structured edit UX
+- Add autosave and draft recovery
 
 ## Notes for AI Coding Agents
 
@@ -285,3 +287,11 @@ v0.4.3.1: candidate layout and structured edit UX hotfix.
 - User-facing edit mode now uses structured fields instead of raw JSON.
 - Candidate, Recommended Direction, Direction Package, Proposal Copy, Prompt Package, and Execution Advice all support field-based editing.
 - Prompt Package editing keeps Chinese and English prompt versions editable separately.
+
+## v0.4.3.2 Autosave Recovery
+
+- v0.4.3.2 adds a current draft autosave in localStorage.
+- Current draft is separate from manually saved history; history still stores multiple explicit saves.
+- Full generation, Demo fallback, section edits, partial regeneration, and input/provider/model changes update the current draft.
+- Refreshing the page shows a restore/discard prompt when an autosaved draft exists.
+- Reference images are stored only as metadata in the draft, never as binary/base64 image data.

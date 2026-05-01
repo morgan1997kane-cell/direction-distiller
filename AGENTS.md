@@ -296,6 +296,14 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Do not store image binary data in localStorage; only keep reference image metadata.
 - On page load, show a lightweight restore/discard prompt instead of automatically overwriting the current screen.
 
+## Export Output
+
+- v0.4.4 adds deliverable export output for the current `DirectionResult`.
+- Export utilities live in `src/lib/exportResult.ts`; the UI entry is `src/components/ExportPanel.tsx`.
+- Supported exports: full Markdown direction package, client proposal copy, internal production copy, and `.md` download.
+- Export is frontend-only and should not call backend APIs or mutate autosave drafts / history.
+- Prompt Package export should support bilingual `zh` / `en` payloads and tolerate older flat prompt payloads.
+
 ## Current Version History
 
 当前可见版本号维护在 `src/lib/version.ts`。
@@ -323,6 +331,7 @@ v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, 
 v0.4.3.1: candidate layout and structured edit UX hotfix.
 v0.4.3.2: current draft autosave and refresh recovery.
 v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package normalization and clearer provider diagnostics.
+v0.4.4: export-ready deliverable output with Markdown download, client copy, and internal production copy.
 
 相关 Git 提交记录中应包含：
 
@@ -343,6 +352,7 @@ v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package normal
 - Fix candidate layout and structured edit UX
 - Add autosave and draft recovery
 - Fix live response normalization compatibility
+- Add markdown and proposal export
 
 ## Do Not Do Unless Explicitly Asked
 

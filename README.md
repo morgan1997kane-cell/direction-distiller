@@ -241,6 +241,7 @@ v0.4.3: result layout clarity fix with collapsible sections, clearer summaries, 
 v0.4.3.1: candidate layout and structured edit UX hotfix.
 v0.4.3.2: current draft autosave and refresh recovery.
 v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package and provider normalization.
+v0.4.4: export-ready deliverable output with Markdown download, client copy, and internal production copy.
 
 相关 Git 提交记录中应包含：
 
@@ -302,3 +303,10 @@ v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package and pr
 - v0.4.3.3 makes live provider responses more tolerant of older or partial `DirectionResult` shapes.
 - Legacy flat `prompt_package` payloads are normalized into bilingual `zh` / `en` prompt packages.
 - Provider responses with common aliases are mapped before validation, and server logs now report specific missing fields.
+
+## v0.4.4 Export Ready
+
+- v0.4.4 adds deliverable export output based on the current frontend `DirectionResult`.
+- Supported exports: full Markdown direction package, client proposal copy, internal production copy, and `.md` download.
+- Export does not call backend APIs and does not modify autosave drafts or saved history.
+- Prompt Package export supports bilingual `zh` / `en` payloads and remains compatible with older flat prompt payloads.

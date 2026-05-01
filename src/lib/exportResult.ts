@@ -1,0 +1,285 @@
+import { copyText } from "@/lib/copy";
+import { APP_VERSION, APP_VERSION_LABEL } from "@/lib/version";
+import type { DirectionCandidate, DirectionResult, PromptLanguagePackage } from "@/lib/types";
+
+function lineList(items: string[]) {
+  return items.length > 0 ? items.map((item) => `- ${item}`).join("\n") : "- 未提供";
+}
+
+function numberedList(items: string[]) {
+  return items.length > 0 ? items.map((item, index) => `${index + 1}. ${item}`).join("\n") : "1. 未提供";
+}
+
+function text(value: string | undefined, fallback = "未提供") {
+  return value && value.trim() ? value.trim() : fallback;
+}
+
+function formatDate(value: string | undefined) {
+  const date = value ? new Date(value) : new Date();
+  if (Number.isNaN(date.getTime())) return new Date().toISOString();
+  return date.toLocaleString("zh-CN", { hour12: false });
+}
+
+function aiModeLabel(result: DirectionResult) {
+  if (result.ai_mode === "live") {
+    return ["Live", result.ai_provider, result.ai_model].filter(Boolean).join(" · ");
+  }
+  return "Demo";
+}
+
+function promptZh(result: DirectionResult): PromptLanguagePackage {
+  const prompt = result.prompt_package;
+  return prompt.zh ?? {
+    main_prompt: prompt.main_prompt,
+    variation_prompts: prompt.variation_prompts,
+    negative_constraints: prompt.negative_constraints,
+  };
+}
+
+function promptEn(result: DirectionResult): PromptLanguagePackage | null {
+  return result.prompt_package.en ?? null;
+}
+
+function formatCandidate(candidate: DirectionCandidate, index: number, includeScores = true) {
+  return [
+    `### ${index + 1}. ${candidate.title}`,
+    "",
+    `类型：${candidate.type}`,
+    "",
+    "一句话概念：",
+    candidate.one_line_concept,
+    "",
+    "视觉关键词：",
+    lineList(candidate.visual_keywords),
+    "",
+    "情绪关键词：",
+    lineList(candidate.mood_keywords),
+    "",
+    "优势：",
+    candidate.strength,
+    "",
+    "风险：",
+    candidate.risk,
+    ...(includeScores
+      ? [
+          "",
+          "评分：",
+          `- 清晰度：${candidate.scores.clarity}`,
+          `- 画面可控性：${candidate.scores.visual_control}`,
+          `- 提案价值：${candidate.scores.proposal_value}`,
+          `- 执行可行性：${candidate.scores.execution_feasibility}`,
+        ]
+      : []),
+  ].join("\n");
+}
+
+function promptMarkdown(result: DirectionResult) {
+  const zh = promptZh(result);
+  const en = promptEn(result);
+
+  return [
+    "## Prompt 草稿",
+    "",
+    "### 中文 Prompt",
+    "",
+    "主 Prompt：",
+    text(zh.main_prompt),
+    "",
+    "变体 Prompt：",
+    numberedList(zh.variation_prompts),
+    "",
+    "限制词：",
+    lineList(zh.negative_constraints),
+    "",
+    "### English Prompt",
+    "",
+    en
+      ? [
+          "Main Prompt:",
+          text(en.main_prompt),
+          "",
+          "Variation Prompts:",
+          numberedList(en.variation_prompts),
+          "",
+          "Negative Constraints:",
+          lineList(en.negative_constraints),
+        ].join("\n")
+      : "English version not available.",
+  ].join("\n");
+}
+
+export function formatMarkdownExport(result: DirectionResult) {
+  return [
+    "# Direction Distiller 视觉方向包",
+    "",
+    "## 基本信息",
+    "",
+    `- 项目类型：${result.project_type}`,
+    `- 输出目标：${result.output_goal}`,
+    `- AI Mode：${result.ai_mode ?? "demo"}`,
+    `- Provider：${result.ai_provider ?? "Demo"}`,
+    `- Model：${result.ai_model ?? "Demo Generator"}`,
+    `- 生成时间：${formatDate(result.createdAt)}`,
+    "",
+    "## 输入摘要",
+    "",
+    result.input_summary,
+    "",
+    "## 推荐方向",
+    "",
+    `### ${result.recommended_direction.title}`,
+    "",
+    result.recommended_direction.core_sentence,
+    "",
+    "推荐理由：",
+    result.recommended_direction.reason,
+    "",
+    "## 三个方向候选",
+    "",
+    ...result.candidate_directions.map((candidate, index) => formatCandidate(candidate, index)),
+    "",
+    "## 视觉方向包",
+    "",
+    "### 核心概念",
+    result.direction_package.core_concept,
+    "",
+    "### 情绪关键词",
+    lineList(result.direction_package.mood),
+    "",
+    "### 材质关键词",
+    lineList(result.direction_package.material),
+    "",
+    "### 光线关键词",
+    lineList(result.direction_package.lighting),
+    "",
+    "### 构图 / 镜头关键词",
+    lineList(result.direction_package.composition),
+    "",
+    "### 色调关键词",
+    lineList(result.direction_package.color_palette),
+    "",
+    "### 避免跑偏",
+    lineList(result.direction_package.do_not),
+    "",
+    "## 提案文案",
+    "",
+    "### 短 Pitch",
+    result.proposal_copy.short_pitch,
+    "",
+    "### 客户可读描述",
+    result.proposal_copy.client_facing_description,
+    "",
+    "### 内部执行备注",
+    result.proposal_copy.internal_direction_note,
+    "",
+    promptMarkdown(result),
+    "",
+    "## 下一步执行建议",
+    "",
+    "### 第一件事",
+    result.execution_advice.first_step,
+    "",
+    "### 推荐工作流",
+    result.execution_advice.recommended_workflow,
+    "",
+    "### 风险提醒",
+    result.execution_advice.risk_warning,
+    "",
+    "## Generated by Direction Distiller",
+    "",
+    `版本：${APP_VERSION} · ${APP_VERSION_LABEL}`,
+    `时间：${formatDate(new Date().toISOString())}`,
+  ].join("\n");
+}
+
+export function formatClientExport(result: DirectionResult) {
+  return [
+    `# ${result.recommended_direction.title}`,
+    "",
+    result.recommended_direction.core_sentence,
+    "",
+    result.proposal_copy.client_facing_description,
+    "",
+    "## 视觉关键词",
+    lineList(result.direction_package.mood.concat(result.candidate_directions[0]?.visual_keywords ?? []).slice(0, 8)),
+    "",
+    "## 情绪关键词",
+    lineList(result.direction_package.mood),
+    "",
+    "## 方向候选",
+    "",
+    ...result.candidate_directions.flatMap((candidate, index) => [
+      `${index + 1}. ${candidate.title}`,
+      candidate.one_line_concept,
+      "",
+    ]),
+    "## 下一步建议",
+    result.execution_advice.first_step,
+  ].join("\n");
+}
+
+export function formatInternalExport(result: DirectionResult) {
+  return [
+    "# Direction Distiller 内部执行版",
+    "",
+    `AI Mode：${aiModeLabel(result)}`,
+    `生成时间：${formatDate(result.createdAt)}`,
+    `版本：${APP_VERSION} · ${APP_VERSION_LABEL}`,
+    "",
+    "## 输入摘要",
+    result.input_summary,
+    "",
+    "## 推荐方向",
+    `${result.recommended_direction.title}：${result.recommended_direction.core_sentence}`,
+    "",
+    result.recommended_direction.reason,
+    "",
+    "## 三个方向候选",
+    "",
+    ...result.candidate_directions.map((candidate, index) => formatCandidate(candidate, index)),
+    "",
+    "## 视觉方向包",
+    "",
+    `核心概念：${result.direction_package.core_concept}`,
+    "",
+    `情绪：${result.direction_package.mood.join("、")}`,
+    `材质：${result.direction_package.material.join("、")}`,
+    `光线：${result.direction_package.lighting.join("、")}`,
+    `构图：${result.direction_package.composition.join("、")}`,
+    `色调：${result.direction_package.color_palette.join("、")}`,
+    "",
+    "避免跑偏：",
+    lineList(result.direction_package.do_not),
+    "",
+    promptMarkdown(result),
+    "",
+    "## 执行建议",
+    "",
+    `第一件事：${result.execution_advice.first_step}`,
+    "",
+    `推荐工作流：${result.execution_advice.recommended_workflow}`,
+    "",
+    `风险提醒：${result.execution_advice.risk_warning}`,
+  ].join("\n");
+}
+
+export async function copyMarkdownExport(result: DirectionResult) {
+  await copyText(formatMarkdownExport(result));
+}
+
+export async function copyClientExport(result: DirectionResult) {
+  await copyText(formatClientExport(result));
+}
+
+export async function copyInternalExport(result: DirectionResult) {
+  await copyText(formatInternalExport(result));
+}
+
+export function getMarkdownExportFilename(result: DirectionResult) {
+  const date = new Date().toISOString().slice(0, 10);
+  const slug = result.project_type
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "");
+  return `direction-distiller-${date}-${slug || "visual-direction"}.md`;
+}

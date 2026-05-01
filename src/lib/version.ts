@@ -1,2 +1,2 @@
-export const APP_VERSION = "v0.4.3.3";
-export const APP_VERSION_LABEL = "Live Response Hotfix";
+export const APP_VERSION = "v0.4.4";
+export const APP_VERSION_LABEL = "Export Ready";

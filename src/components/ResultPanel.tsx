@@ -16,6 +16,7 @@ import { CandidateCard } from "@/components/CandidateCard";
 import { DirectionPackageCard } from "@/components/DirectionPackageCard";
 import { CollapsibleSection, EditableSection } from "@/components/EditableSection";
 import { ExecutionAdviceCard } from "@/components/ExecutionAdviceCard";
+import { ExportPanel } from "@/components/ExportPanel";
 import { PromptPackageCard } from "@/components/PromptPackageCard";
 import { ProposalCopyCard } from "@/components/ProposalCopyCard";
 import { RecommendedDirectionCard } from "@/components/RecommendedDirectionCard";
@@ -370,6 +371,8 @@ export function ResultPanel({
       >
         <ExecutionAdviceCard advice={result.execution_advice} />
       </EditableSection>
+
+      <ExportPanel result={result} />
 
       <div className="sticky bottom-4 z-20 flex max-h-32 flex-wrap gap-2 overflow-y-auto border border-white/10 bg-black/85 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-md">
         <ActionButton onClick={() => copyText(formatDirectionMarkdown(result))}>复制方向包</ActionButton>

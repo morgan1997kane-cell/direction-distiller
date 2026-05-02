@@ -313,6 +313,14 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Archive supports search, filter, rename, favorite, restore, delete, clear all, and Markdown copy via `src/lib/exportResult.ts`.
 - Do not store image binary data in archive; keep only metadata already present in `DirectionInput`.
 
+## Guided Workflow
+
+- v0.4.6 adds a default guided workflow while preserving advanced freedom.
+- Workflow Stepper lives in `src/components/WorkflowStepper.tsx` and tracks Input, Generate, Refine, Export, Archive.
+- Next Action Panel lives in `src/components/NextActionPanel.tsx` and should adapt to result mode, edited state, export state, and archive state.
+- Provider / model controls are treated as advanced settings and wrapped by `src/components/AdvancedSettingsPanel.tsx`.
+- Keep section editing, partial regeneration, export, autosave, and Project Archive available even when guidance is shown.
+
 ## Current Version History
 
 当前可见版本号维护在 `src/lib/version.ts`。
@@ -342,6 +350,7 @@ v0.4.3.2: current draft autosave and refresh recovery.
 v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package normalization and clearer provider diagnostics.
 v0.4.4: export-ready deliverable output with Markdown download, client copy, and internal production copy.
 v0.4.5: project archive upgrade with search, rename, favorite, restore, delete, and Markdown copy.
+v0.4.6: guided workflow and next action system with progressive disclosure for advanced settings.
 
 相关 Git 提交记录中应包含：
 
@@ -364,6 +373,7 @@ v0.4.5: project archive upgrade with search, rename, favorite, restore, delete, 
 - Fix live response normalization compatibility
 - Add markdown and proposal export
 - Upgrade history into project archive
+- Add guided workflow and next action system
 
 ## Do Not Do Unless Explicitly Asked
 

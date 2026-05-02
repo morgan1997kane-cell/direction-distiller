@@ -40,10 +40,12 @@ interface ResultPanelProps {
   provider: AIProvider;
   model: string;
   saved: boolean;
+  edited?: boolean;
   onResultChange: (result: DirectionResult) => void;
   onSave: () => void;
   onRegenerate: () => void;
   onClear: () => void;
+  onExport?: () => void;
 }
 
 export function ResultPanel({
@@ -52,10 +54,12 @@ export function ResultPanel({
   provider,
   model,
   saved,
+  edited = false,
   onResultChange,
   onSave,
   onRegenerate,
   onClear,
+  onExport,
 }: ResultPanelProps) {
   const [regeneratingKey, setRegeneratingKey] = useState("");
   const [notice, setNotice] = useState("");
@@ -166,6 +170,9 @@ export function ResultPanel({
           </span>
         </div>
         <h2 className="mt-3 text-3xl font-semibold text-zinc-50">方向压缩结果</h2>
+        <p className="mt-3 max-w-2xl text-sm leading-6 text-zinc-500">
+          建议先检查推荐方向。如果方向基本成立，再进入局部编辑、Prompt 优化或导出。
+        </p>
         {notice ? <p className="mt-3 text-sm text-amber-100/80">{notice}</p> : null}
       </header>
 
@@ -372,12 +379,12 @@ export function ResultPanel({
         <ExecutionAdviceCard advice={result.execution_advice} />
       </EditableSection>
 
-      <ExportPanel result={result} />
+      <ExportPanel result={result} onExport={onExport} />
 
       <div className="sticky bottom-4 z-20 flex max-h-32 flex-wrap gap-2 overflow-y-auto border border-white/10 bg-black/85 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.45)] backdrop-blur-md">
         <ActionButton onClick={() => copyText(formatDirectionMarkdown(result))}>复制方向包</ActionButton>
         <ActionButton onClick={() => copyText(formatPromptMarkdown(result))}>复制 Prompt</ActionButton>
-        <ActionButton onClick={onSave}>{saved ? "已保存" : "保存到历史"}</ActionButton>
+        <ActionButton onClick={onSave}>{saved ? "已保存到 Archive" : edited ? "保存修改到 Archive" : "保存到 Project Archive"}</ActionButton>
         <ActionButton onClick={onRegenerate}>重新生成</ActionButton>
         <ActionButton onClick={onClear} muted>
           清空输入

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { outputGoals, projectTypes, styleTags } from "@/data/presets";
+import { AdvancedSettingsPanel } from "@/components/AdvancedSettingsPanel";
 import { AIProviderSelector } from "@/components/AIProviderSelector";
 import { ExamplePrompts } from "@/components/ExamplePrompts";
 import { GenerationLoadingState } from "@/components/GenerationLoadingState";
@@ -13,6 +14,8 @@ import { ProductIntro } from "@/components/ProductIntro";
 import { ResultPanel } from "@/components/ResultPanel";
 import { VersionBadge } from "@/components/VersionBadge";
 import { ValueFlow } from "@/components/ValueFlow";
+import { WorkflowStepper, type WorkflowStep } from "@/components/WorkflowStepper";
+import { NextActionPanel } from "@/components/NextActionPanel";
 import {
   getDefaultModel,
   isSupportedModel,
@@ -121,6 +124,8 @@ export function InputComposer() {
   const [aiProvider, setAiProvider] = useState<AIProvider>(defaultAIProvider);
   const [aiModel, setAiModel] = useState<string>(getDefaultModel(defaultAIProvider));
   const [savedResultId, setSavedResultId] = useState("");
+  const [workflowStep, setWorkflowStep] = useState<WorkflowStep>("input");
+  const [hasEditedResult, setHasEditedResult] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
 
   const currentInput: DirectionInput = {
@@ -210,6 +215,7 @@ export function InputComposer() {
     setSelectedStyles(example.styleTags);
     setError("");
     setNotice("");
+    setWorkflowStep("input");
     window.scrollTo({ top: 360, behavior: "smooth" });
   }
 
@@ -222,6 +228,8 @@ export function InputComposer() {
     setError("");
     setNotice("");
     setSavedResultId("");
+    setWorkflowStep("generate");
+    setHasEditedResult(false);
     setGenerationStageIndex(0);
     setIsGenerating(true);
     const generationInput = currentInput;
@@ -235,6 +243,7 @@ export function InputComposer() {
         setResult(demoResult);
         setResultInput(generationInput);
         autosaveResult(demoResult, generationInput);
+        setWorkflowStep("refine");
         return;
       }
 
@@ -242,6 +251,7 @@ export function InputComposer() {
       setResult(nextResult);
       setResultInput(generationInput);
       autosaveResult(nextResult, generationInput);
+      setWorkflowStep("refine");
     } catch (generationError) {
       console.warn("Live AI generation failed, falling back to local mock generator.", generationError);
       const fallbackResult = normalizeDirectionResult(generateDirectionResult(generationInput), generationInput, "demo");
@@ -251,6 +261,7 @@ export function InputComposer() {
       autosaveResult(fallbackResult, generationInput, fallbackNotice);
       setNotice(`${fallbackNotice} 当前 Demo 结果已自动保存，可稍后恢复。`);
     } finally {
+      setWorkflowStep("refine");
       setIsGenerating(false);
       window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
     }
@@ -262,6 +273,8 @@ export function InputComposer() {
     const item = createArchiveItem(result, resultInput, existing);
     setHistory(saveArchiveItem(item));
     setSavedResultId(item.id);
+    setWorkflowStep("archive");
+    setHasEditedResult(false);
     autosaveResult(result, resultInput);
     setNotice(`已保存到 Project Archive：${item.title}`);
   }
@@ -275,6 +288,8 @@ export function InputComposer() {
     setResult(item.result);
     setResultInput(item.input);
     setSavedResultId(item.id);
+    setWorkflowStep("refine");
+    setHasEditedResult(false);
     if (item.provider && isSupportedProvider(item.provider)) {
       setAiProvider(item.provider);
       setAiModel(normalizeModel(item.provider, item.model));
@@ -298,6 +313,8 @@ export function InputComposer() {
     setResult(draft.result);
     setResultInput(draft.inputState);
     setSavedResultId("");
+    setWorkflowStep("refine");
+    setHasEditedResult(false);
     setDraftToRecover(null);
     setAutosavedAt(draft.updatedAt);
     setNotice("已恢复上次自动保存的生成结果。");
@@ -319,6 +336,8 @@ export function InputComposer() {
     setResult(null);
     setResultInput(null);
     setSavedResultId("");
+    setWorkflowStep("input");
+    setHasEditedResult(false);
     setError("");
     setNotice("");
     discardCurrentDraft();
@@ -361,6 +380,7 @@ export function InputComposer() {
 
       <section className="mx-auto grid w-full max-w-6xl gap-5 px-5 pb-10 lg:grid-cols-[minmax(0,1fr)_320px]">
         <div className="border border-white/10 bg-white/[0.035] p-4 shadow-[0_30px_120px_rgba(0,0,0,0.35)] md:p-6">
+          <WorkflowStepper currentStep={isGenerating ? "generate" : workflowStep} />
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
               <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/60">Creative Workbench</p>
@@ -386,14 +406,22 @@ export function InputComposer() {
             />
           </div>
 
+          {!result && !isGenerating ? (
+            <div className="mt-5">
+              <NextActionPanel step="input" />
+            </div>
+          ) : null}
+
           <div className="mt-6 grid gap-6">
             <ImageUploader images={referenceImages} onChange={setReferenceImages} />
-            <AIProviderSelector
-              provider={aiProvider}
-              model={aiModel}
-              onProviderChange={updateAIProvider}
-              onModelChange={updateAIModel}
-            />
+            <AdvancedSettingsPanel summary={`${aiProvider} · ${aiModel}`}>
+              <AIProviderSelector
+                provider={aiProvider}
+                model={aiModel}
+                onProviderChange={updateAIProvider}
+                onModelChange={updateAIModel}
+              />
+            </AdvancedSettingsPanel>
             <OptionChips
               label="项目类型"
               options={projectTypes}
@@ -471,22 +499,29 @@ export function InputComposer() {
         {isGenerating ? (
           <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
         ) : result && resultInput ? (
-          <ResultPanel
-            result={result}
-            input={resultInput}
-            provider={aiProvider}
-            model={aiModel}
-            saved={Boolean(savedResultId)}
-            onResultChange={(nextResult) => {
-              setResult(nextResult);
-              setSavedResultId("");
-              const draft = updateCurrentDraftResult(nextResult);
-              if (draft) setAutosavedAt(draft.updatedAt);
-            }}
-            onSave={saveCurrent}
-            onRegenerate={runGenerate}
-            onClear={clearInput}
-          />
+          <div className="space-y-6">
+            <NextActionPanel step={workflowStep} result={result} saved={Boolean(savedResultId)} edited={hasEditedResult} />
+            <ResultPanel
+              result={result}
+              input={resultInput}
+              provider={aiProvider}
+              model={aiModel}
+              saved={Boolean(savedResultId)}
+              edited={hasEditedResult}
+              onResultChange={(nextResult) => {
+                setResult(nextResult);
+                setSavedResultId("");
+                setWorkflowStep("refine");
+                setHasEditedResult(true);
+                const draft = updateCurrentDraftResult(nextResult);
+                if (draft) setAutosavedAt(draft.updatedAt);
+              }}
+              onSave={saveCurrent}
+              onRegenerate={runGenerate}
+              onClear={clearInput}
+              onExport={() => setWorkflowStep("export")}
+            />
+          </div>
         ) : null}
       </div>
     </main>

@@ -12,13 +12,15 @@ import {
 
 interface ExportPanelProps {
   result: DirectionResult;
+  onExport?: () => void;
 }
 
-export function ExportPanel({ result }: ExportPanelProps) {
+export function ExportPanel({ result, onExport }: ExportPanelProps) {
   const [notice, setNotice] = useState("");
 
   async function run(label: string, action: () => Promise<void> | void) {
     await action();
+    onExport?.();
     setNotice(label);
     window.setTimeout(() => setNotice(""), 1800);
   }

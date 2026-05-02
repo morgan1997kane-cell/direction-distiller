@@ -243,6 +243,7 @@ v0.4.3.2: current draft autosave and refresh recovery.
 v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package and provider normalization.
 v0.4.4: export-ready deliverable output with Markdown download, client copy, and internal production copy.
 v0.4.5: project archive upgrade with search, rename, favorite, restore, delete, and Markdown copy.
+v0.4.6: guided workflow and next action system with progressive disclosure for advanced settings.
 
 相关 Git 提交记录中应包含：
 
@@ -319,3 +320,10 @@ v0.4.5: project archive upgrade with search, rename, favorite, restore, delete, 
 - Archive records support title, brief summary, project type, provider/model, AI mode, favorite state, createdAt, and updatedAt metadata.
 - Archive UI supports search, filter, rename, favorite, restore, delete, clear all, and quick Markdown copy.
 - Restored archive results can continue editing, partial regeneration, autosave, and export.
+
+## v0.4.6 Guided Workflow
+
+- v0.4.6 adds a lightweight Workflow Stepper for Input, Generate, Refine, Export, and Archive.
+- Next Action Panel gives short state-aware guidance after input, generation, editing, export, and archive actions.
+- Provider / model controls are still available but are wrapped as advanced AI engine settings.
+- The product keeps the default guided path while preserving section editing, partial regeneration, autosave, export, and Project Archive.

@@ -118,7 +118,7 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
 
       {items.length === 0 ? (
         <p className="mt-5 border-t border-white/10 pt-4 text-sm leading-6 text-zinc-500">
-          保存后的方向包会出现在这里，仅存储在本地浏览器。
+          保存后的方向包会出现在这里。生成结果后点击保存到 Project Archive，仅存储在本地浏览器。
         </p>
       ) : visibleItems.length === 0 ? (
         <p className="mt-5 border-t border-white/10 pt-4 text-sm leading-6 text-zinc-500">没有匹配的归档项目。</p>

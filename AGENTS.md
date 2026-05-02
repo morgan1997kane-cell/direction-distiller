@@ -304,6 +304,15 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Export is frontend-only and should not call backend APIs or mutate autosave drafts / history.
 - Prompt Package export should support bilingual `zh` / `en` payloads and tolerate older flat prompt payloads.
 
+## Project Archive
+
+- v0.4.5 upgrades saved history into a local Project Archive.
+- Archive items are user-saved records and are separate from the single current draft autosave.
+- Archive records support title, brief summary, project type, output goal, style tags, provider/model, AI mode, favorite, createdAt, and updatedAt metadata.
+- Archive UI lives in `src/components/HistoryPanel.tsx`; storage helpers live in `src/lib/storage.ts`.
+- Archive supports search, filter, rename, favorite, restore, delete, clear all, and Markdown copy via `src/lib/exportResult.ts`.
+- Do not store image binary data in archive; keep only metadata already present in `DirectionInput`.
+
 ## Current Version History
 
 当前可见版本号维护在 `src/lib/version.ts`。
@@ -332,6 +341,7 @@ v0.4.3.1: candidate layout and structured edit UX hotfix.
 v0.4.3.2: current draft autosave and refresh recovery.
 v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package normalization and clearer provider diagnostics.
 v0.4.4: export-ready deliverable output with Markdown download, client copy, and internal production copy.
+v0.4.5: project archive upgrade with search, rename, favorite, restore, delete, and Markdown copy.
 
 相关 Git 提交记录中应包含：
 
@@ -353,6 +363,7 @@ v0.4.4: export-ready deliverable output with Markdown download, client copy, and
 - Add autosave and draft recovery
 - Fix live response normalization compatibility
 - Add markdown and proposal export
+- Upgrade history into project archive
 
 ## Do Not Do Unless Explicitly Asked
 

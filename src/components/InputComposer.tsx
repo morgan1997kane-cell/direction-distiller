@@ -25,12 +25,15 @@ import { generateDirection } from "@/lib/generateDirection";
 import { generateDirectionResult } from "@/lib/mockGenerator";
 import {
   clearCurrentDraft,
-  clearSavedResults,
-  deleteSavedResult,
+  clearArchiveItems,
+  createArchiveItem,
+  deleteArchiveItem,
   getSavedResults,
   loadCurrentDraft,
-  saveDirectionResult,
+  renameArchiveItem,
+  saveArchiveItem,
   saveAutosaveSnapshot,
+  toggleArchiveFavorite,
   updateCurrentDraftAiMeta,
   updateCurrentDraftInput,
   updateCurrentDraftResult,
@@ -255,18 +258,12 @@ export function InputComposer() {
 
   function saveCurrent() {
     if (!result || !resultInput) return;
-    const item: SavedDirectionResult = {
-      id: result.id,
-      savedAt: new Date().toISOString(),
-      title: result.proposal_copy.short_pitch,
-      projectType: result.project_type,
-      recommendedTitle: result.recommended_direction.title,
-      input: resultInput,
-      result,
-    };
-    setHistory(saveDirectionResult(item));
-    setSavedResultId(result.id);
+    const existing = history.find((item) => item.id === savedResultId);
+    const item = createArchiveItem(result, resultInput, existing);
+    setHistory(saveArchiveItem(item));
+    setSavedResultId(item.id);
     autosaveResult(result, resultInput);
+    setNotice(`已保存到 Project Archive：${item.title}`);
   }
 
   function restoreHistory(item: SavedDirectionResult) {
@@ -277,9 +274,18 @@ export function InputComposer() {
     setSelectedStyles(item.input.styleTags);
     setResult(item.result);
     setResultInput(item.input);
-    setSavedResultId(item.result.id);
+    setSavedResultId(item.id);
+    if (item.provider && isSupportedProvider(item.provider)) {
+      setAiProvider(item.provider);
+      setAiModel(normalizeModel(item.provider, item.model));
+      persistAISettings(item.provider, normalizeModel(item.provider, item.model));
+    } else if (item.aiMode === "demo") {
+      setAiProvider("demo");
+      setAiModel(getDefaultModel("demo"));
+      persistAISettings("demo", getDefaultModel("demo"));
+    }
     autosaveResult(item.result, item.input);
-    setNotice("");
+    setNotice(`已恢复项目：${item.title}`);
     window.setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
   }
 
@@ -444,11 +450,17 @@ export function InputComposer() {
         <HistoryPanel
           items={history}
           onRestore={restoreHistory}
-          onDelete={(id) => setHistory(deleteSavedResult(id))}
-          onClear={() => {
-            clearSavedResults();
-            setHistory([]);
+          onDelete={(id) => {
+            setHistory(deleteArchiveItem(id));
+            if (savedResultId === id) setSavedResultId("");
           }}
+          onClear={() => {
+            clearArchiveItems();
+            setHistory([]);
+            setSavedResultId("");
+          }}
+          onRename={(id, title) => setHistory(renameArchiveItem(id, title))}
+          onToggleFavorite={(id) => setHistory(toggleArchiveFavorite(id))}
         />
       </section>
 
@@ -464,7 +476,7 @@ export function InputComposer() {
             input={resultInput}
             provider={aiProvider}
             model={aiModel}
-            saved={savedResultId === result.id}
+            saved={Boolean(savedResultId)}
             onResultChange={(nextResult) => {
               setResult(nextResult);
               setSavedResultId("");

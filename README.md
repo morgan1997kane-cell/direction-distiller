@@ -242,6 +242,7 @@ v0.4.3.1: candidate layout and structured edit UX hotfix.
 v0.4.3.2: current draft autosave and refresh recovery.
 v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package and provider normalization.
 v0.4.4: export-ready deliverable output with Markdown download, client copy, and internal production copy.
+v0.4.5: project archive upgrade with search, rename, favorite, restore, delete, and Markdown copy.
 
 相关 Git 提交记录中应包含：
 
@@ -310,3 +311,11 @@ v0.4.4: export-ready deliverable output with Markdown download, client copy, and
 - Supported exports: full Markdown direction package, client proposal copy, internal production copy, and `.md` download.
 - Export does not call backend APIs and does not modify autosave drafts or saved history.
 - Prompt Package export supports bilingual `zh` / `en` payloads and remains compatible with older flat prompt payloads.
+
+## v0.4.5 Project Archive
+
+- v0.4.5 upgrades simple history into a local Project Archive.
+- Current draft remains a single autosaved recovery state; Project Archive is user-saved and can contain multiple records.
+- Archive records support title, brief summary, project type, provider/model, AI mode, favorite state, createdAt, and updatedAt metadata.
+- Archive UI supports search, filter, rename, favorite, restore, delete, clear all, and quick Markdown copy.
+- Restored archive results can continue editing, partial regeneration, autosave, and export.

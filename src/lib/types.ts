@@ -127,12 +127,22 @@ export interface DirectionResult {
 
 export interface SavedDirectionResult {
   id: string;
-  savedAt: string;
   title: string;
+  brief: string;
   projectType: ProjectType;
+  outputGoal: OutputGoal;
+  styleTags: StyleTag[];
+  provider?: string;
+  model?: string;
+  aiMode: "live" | "demo";
   recommendedTitle: string;
   input: DirectionInput;
   result: DirectionResult;
+  createdAt: string;
+  updatedAt: string;
+  savedAt?: string;
+  favorite?: boolean;
+  exportedAt?: string;
 }
 
 export interface CurrentDraftInputState {

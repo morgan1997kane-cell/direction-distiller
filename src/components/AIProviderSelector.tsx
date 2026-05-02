@@ -30,7 +30,7 @@ export function AIProviderSelector({
   }, []);
 
   return (
-    <section className="border border-white/10 bg-black/25 p-3">
+    <section className="bg-black/15 p-3">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/45">AI Settings</p>
@@ -45,7 +45,7 @@ export function AIProviderSelector({
           <select
             value={provider}
             onChange={(event) => onProviderChange(event.target.value as AIProvider)}
-            className="h-10 border border-white/10 bg-zinc-950 px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-200/40"
+            className="h-10 border border-white/10 bg-[#0d0f12] px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-200/35"
           >
             {SUPPORTED_PROVIDERS.map((item) => (
               <option key={item} value={item}>
@@ -61,7 +61,7 @@ export function AIProviderSelector({
             value={(modelOptions as readonly string[]).includes(model) ? model : getDefaultModel(provider)}
             onChange={(event) => onModelChange(event.target.value)}
             disabled={provider === "demo"}
-            className="h-10 border border-white/10 bg-zinc-950 px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-200/40 disabled:cursor-not-allowed disabled:text-zinc-600"
+            className="h-10 border border-white/10 bg-[#0d0f12] px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-200/35 disabled:cursor-not-allowed disabled:text-zinc-600"
           >
             {modelOptions.map((item) => (
               <option key={item} value={item}>

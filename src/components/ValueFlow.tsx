@@ -18,16 +18,19 @@ const valueItems = [
 
 export function ValueFlow() {
   return (
-    <section className="mx-auto w-full max-w-6xl px-5 pb-8">
-      <div className="grid gap-3 md:grid-cols-3">
+    <section className="mx-auto w-full max-w-7xl px-5 pb-12">
+      <div className="grid border-y border-white/10 md:grid-cols-3">
         {valueItems.map((item, index) => (
-          <article key={item.title} className="border border-white/10 bg-white/[0.03] p-4">
-            <div className="flex items-center justify-between gap-3">
-              <p className="text-xs uppercase tracking-[0.2em] text-cyan-100/50">{item.label}</p>
+          <article
+            key={item.title}
+            className="border-white/10 py-6 md:border-r md:px-6 md:last:border-r-0"
+          >
+            <div className="flex items-center gap-3">
               <span className="font-mono text-xs text-zinc-600">0{index + 1}</span>
+              <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/45">{item.label}</p>
             </div>
-            <h2 className="mt-4 text-base font-medium text-zinc-100">{item.title}</h2>
-            <p className="mt-2 text-sm leading-6 text-zinc-500">{item.body}</p>
+            <h2 className="mt-5 text-xl font-medium text-zinc-100">{item.title}</h2>
+            <p className="mt-3 max-w-sm text-sm leading-7 text-zinc-500">{item.body}</p>
           </article>
         ))}
       </div>

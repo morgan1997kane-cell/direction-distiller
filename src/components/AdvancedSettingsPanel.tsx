@@ -11,7 +11,7 @@ export function AdvancedSettingsPanel({ children, summary }: AdvancedSettingsPan
   const [expanded, setExpanded] = useState(false);
 
   return (
-    <section className="border border-white/10 bg-black/20 p-3">
+    <section className="border-t border-white/10 pt-4">
       <button
         type="button"
         onClick={() => setExpanded((current) => !current)}
@@ -22,10 +22,10 @@ export function AdvancedSettingsPanel({ children, summary }: AdvancedSettingsPan
           <h3 className="mt-1 text-sm font-medium text-zinc-300">AI 引擎设置</h3>
           <p className="mt-1 text-xs text-zinc-600">{summary}</p>
         </div>
-        <span className="shrink-0 border border-white/10 px-2 py-1 text-xs text-zinc-500">{expanded ? "收起" : "展开"}</span>
+        <span className="shrink-0 border border-white/10 bg-white/[0.02] px-2 py-1 text-xs text-zinc-500">{expanded ? "收起" : "展开"}</span>
       </button>
 
-      {expanded ? <div className="mt-3 border-t border-white/10 pt-3">{children}</div> : null}
+      {expanded ? <div className="mt-4">{children}</div> : null}
     </section>
   );
 }

@@ -11,27 +11,25 @@ const groups: Array<[keyof DirectionPackage, string, string]> = [
 
 export function DirectionPackageCard({ directionPackage }: { directionPackage: DirectionPackage }) {
   return (
-    <section className="border border-white/10 bg-white/[0.025] p-5 md:p-6">
-      <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
-        <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Strategy Board</p>
-          <h2 className="mt-2 text-2xl font-semibold text-zinc-50">视觉方向包</h2>
-        </div>
+    <section className="bg-white/[0.025] p-5 md:p-7">
+      <div>
+        <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Strategy Board</p>
+        <h2 className="mt-3 text-3xl font-semibold text-zinc-50">视觉方向包</h2>
       </div>
 
-      <div className="mt-6 border border-white/10 bg-black/25 p-5">
+      <div className="mt-7 border-l border-cyan-100/25 pl-5">
         <p className="text-xs text-zinc-500">核心概念</p>
-        <p className="mt-3 text-base leading-8 text-zinc-200">{directionPackage.core_concept}</p>
+        <p className="mt-3 max-w-4xl text-lg leading-9 text-zinc-200">{directionPackage.core_concept}</p>
       </div>
 
-      <div className="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-8 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         {groups.map(([key, title, label]) => (
-          <div key={key} className="border border-white/10 bg-zinc-950/70 p-4">
+          <div key={key} className="border-t border-white/10 pt-5">
             <p className="text-[11px] uppercase tracking-[0.18em] text-cyan-100/40">{label}</p>
-            <h3 className="mt-2 text-sm font-medium text-zinc-100">{title}</h3>
+            <h3 className="mt-2 text-base font-medium text-zinc-100">{title}</h3>
             <div className="mt-4 flex flex-wrap gap-2">
               {(directionPackage[key] as string[]).map((item) => (
-                <span key={item} className="border border-white/10 bg-white/[0.035] px-2 py-1 text-xs text-zinc-400">
+                <span key={item} className="border border-white/10 bg-black/20 px-2.5 py-1.5 text-xs text-zinc-400">
                   {item}
                 </span>
               ))}

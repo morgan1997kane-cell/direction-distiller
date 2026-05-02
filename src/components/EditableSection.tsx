@@ -70,12 +70,12 @@ export function EditableSection<T>({
   }
 
   return (
-    <section className="min-w-0 border border-white/10 bg-white/[0.018] p-4 md:p-5">
-      <div className="flex flex-col gap-3 border-b border-white/10 pb-4 md:flex-row md:items-start md:justify-between">
+    <section className="min-w-0 border-t border-white/10 py-8 md:py-10">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          {label ? <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/40">{label}</p> : null}
-          <h3 className="mt-1 text-lg font-semibold leading-snug text-zinc-50 md:text-xl">{title}</h3>
-          {description ? <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500">{description}</p> : null}
+          {label ? <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-100/40">{label}</p> : null}
+          <h3 className="mt-2 text-2xl font-semibold leading-snug text-zinc-50 md:text-3xl">{title}</h3>
+          {description ? <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-500">{description}</p> : null}
         </div>
         <div className="flex shrink-0 flex-wrap items-center gap-2">
           {message ? <span className="text-xs text-cyan-100/70">{message}</span> : null}
@@ -91,13 +91,13 @@ export function EditableSection<T>({
       </div>
 
       {!isExpanded && !isEditing ? (
-        <div className="mt-4 border border-white/10 bg-black/25 p-3 text-sm leading-6 text-zinc-400">
+        <div className="mt-5 bg-white/[0.025] px-4 py-3 text-sm leading-7 text-zinc-400">
           {summary ?? <span className="text-zinc-500">已折叠，展开查看完整内容。</span>}
         </div>
       ) : null}
 
       {showInstruction && isExpanded ? (
-        <div className="mt-4 flex flex-col gap-2 border border-white/10 bg-black/30 p-3 md:flex-row">
+        <div className="mt-5 flex flex-col gap-3 bg-black/25 p-4 md:flex-row">
           <input
             value={instruction}
             onChange={(event) => setInstruction(event.target.value)}
@@ -108,7 +108,7 @@ export function EditableSection<T>({
             type="button"
             onClick={submitRegenerate}
             disabled={isRegenerating}
-            className="border border-cyan-200/30 bg-cyan-300/10 px-3 py-2 text-xs text-cyan-50 transition hover:bg-cyan-300/15 disabled:opacity-50"
+            className="border border-cyan-200/25 bg-cyan-300/10 px-4 py-2 text-xs text-cyan-50 transition hover:bg-cyan-300/15 disabled:opacity-50"
           >
             开始局部重生成
           </button>
@@ -116,15 +116,9 @@ export function EditableSection<T>({
       ) : null}
 
       {isEditing ? (
-        <div className="mt-4">
-          {renderEditor({
-            value,
-            onCancel: () => setIsEditing(false),
-            onSave: saveEdit,
-          })}
-        </div>
+        <div className="mt-6">{renderEditor({ value, onCancel: () => setIsEditing(false), onSave: saveEdit })}</div>
       ) : isExpanded ? (
-        <div className="mt-4 min-w-0">{children}</div>
+        <div className="mt-6 min-w-0">{children}</div>
       ) : null}
     </section>
   );
@@ -148,26 +142,24 @@ export function CollapsibleSection({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <section className="min-w-0 border border-white/10 bg-white/[0.018] p-4 md:p-5">
-      <div className="flex flex-col gap-3 border-b border-white/10 pb-4 md:flex-row md:items-start md:justify-between">
+    <section className="min-w-0 border-t border-white/10 py-8 md:py-10">
+      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          {label ? <p className="text-[11px] uppercase tracking-[0.2em] text-cyan-100/40">{label}</p> : null}
-          <h3 className="mt-1 text-lg font-semibold leading-snug text-zinc-50 md:text-xl">{title}</h3>
-          {description ? <p className="mt-2 max-w-3xl text-sm leading-6 text-zinc-500">{description}</p> : null}
+          {label ? <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-100/40">{label}</p> : null}
+          <h3 className="mt-2 text-2xl font-semibold leading-snug text-zinc-50 md:text-3xl">{title}</h3>
+          {description ? <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-500">{description}</p> : null}
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
-          <SectionButton onClick={() => setIsExpanded((current) => !current)} ariaExpanded={isExpanded}>
-            {isExpanded ? "Collapse" : "Expand"}
-          </SectionButton>
-        </div>
+        <SectionButton onClick={() => setIsExpanded((current) => !current)} ariaExpanded={isExpanded}>
+          {isExpanded ? "Collapse" : "Expand"}
+        </SectionButton>
       </div>
 
       {!isExpanded ? (
-        <div className="mt-4 border border-white/10 bg-black/25 p-3 text-sm leading-6 text-zinc-400">
+        <div className="mt-5 bg-white/[0.025] px-4 py-3 text-sm leading-7 text-zinc-400">
           {summary ?? <span className="text-zinc-500">已折叠，展开查看完整内容。</span>}
         </div>
       ) : (
-        <div className="mt-4 min-w-0">{children}</div>
+        <div className="mt-6 min-w-0">{children}</div>
       )}
     </section>
   );
@@ -190,7 +182,7 @@ function SectionButton({
       onClick={onClick}
       disabled={disabled}
       aria-expanded={ariaExpanded}
-      className="border border-white/10 bg-white/[0.03] px-2.5 py-1.5 text-xs text-zinc-400 transition hover:border-cyan-200/30 hover:text-cyan-50 disabled:cursor-not-allowed disabled:opacity-50"
+      className="border border-white/10 bg-white/[0.025] px-3 py-2 text-xs text-zinc-400 transition hover:border-cyan-200/25 hover:bg-white/[0.045] hover:text-cyan-50 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
     </button>

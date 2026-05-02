@@ -74,11 +74,11 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
   }
 
   return (
-    <aside className="border border-white/10 bg-zinc-950/75 p-5">
+    <aside className="bg-white/[0.025] p-5">
       <div className="mb-5 flex items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-zinc-600">Project Archive</p>
-          <h2 className="mt-1 text-lg font-medium text-zinc-100">方向归档</h2>
+          <h2 className="mt-1 text-xl font-medium text-zinc-100">项目归档</h2>
           <p className="mt-2 text-xs leading-5 text-zinc-500">主动保存的方向包会进入项目库；自动草稿仍只保留最近一次。</p>
         </div>
         {items.length > 0 ? (
@@ -93,7 +93,7 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
           value={query}
           onChange={(event) => setQuery(event.target.value)}
           placeholder="搜索标题、brief、项目类型..."
-          className="w-full border border-white/10 bg-black/30 px-3 py-2 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-cyan-200/40"
+          className="w-full border border-white/10 bg-black/20 px-3 py-2.5 text-sm text-zinc-100 outline-none placeholder:text-zinc-600 focus:border-cyan-200/35"
         />
         <div className="flex flex-wrap gap-2">
           {filters.map((item) => (
@@ -104,7 +104,7 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
               className={[
                 "border px-2.5 py-1 text-xs transition",
                 filter === item.value
-                  ? "border-cyan-200/40 bg-cyan-300/10 text-cyan-50"
+                  ? "border-cyan-200/35 bg-cyan-300/[0.08] text-cyan-50"
                   : "border-white/10 bg-white/[0.03] text-zinc-500 hover:text-zinc-200",
               ].join(" ")}
             >
@@ -125,7 +125,7 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
       ) : (
         <div className="mt-5 space-y-3">
           {visibleItems.map((item) => (
-            <article key={item.id} className="border border-white/10 bg-black/25 p-3 transition hover:border-cyan-200/20">
+            <article key={item.id} className="border-t border-white/10 py-4 transition hover:border-cyan-200/20">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   {editingId === item.id ? (

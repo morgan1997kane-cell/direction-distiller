@@ -45,7 +45,7 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
         <span className="text-xs text-zinc-500">{images.length}/6</span>
       </div>
 
-      <label className="group flex min-h-32 cursor-pointer flex-col items-center justify-center rounded-lg border border-dashed border-white/15 bg-black/30 px-5 py-6 text-center transition hover:border-cyan-300/50 hover:bg-cyan-300/[0.04]">
+      <label className="group flex min-h-36 cursor-pointer flex-col items-center justify-center border border-dashed border-white/15 bg-black/20 px-5 py-7 text-center transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.035]">
         <input
           className="sr-only"
           type="file"
@@ -63,7 +63,7 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
       {images.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {images.map((image) => (
-            <div key={image.id} className="group relative overflow-hidden rounded-md border border-white/10 bg-zinc-950">
+            <div key={image.id} className="group relative overflow-hidden border border-white/10 bg-zinc-950">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={image.previewUrl} alt={image.fileName} className="h-28 w-full object-cover" />
               <button

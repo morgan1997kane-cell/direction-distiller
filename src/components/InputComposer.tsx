@@ -350,7 +350,7 @@ export function InputComposer() {
       <VersionBadge />
 
       {draftToRecover ? (
-        <section className="mx-auto mb-5 w-full max-w-6xl px-5">
+        <section className="mx-auto mb-6 w-full max-w-7xl px-5">
           <div className="flex flex-col gap-3 border border-cyan-200/20 bg-cyan-300/[0.06] p-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm text-cyan-50">检测到上次未保存的生成结果，是否恢复？</p>
@@ -378,14 +378,14 @@ export function InputComposer() {
         </section>
       ) : null}
 
-      <section className="mx-auto grid w-full max-w-6xl gap-5 px-5 pb-10 lg:grid-cols-[minmax(0,1fr)_320px]">
-        <div className="border border-white/10 bg-white/[0.035] p-4 shadow-[0_30px_120px_rgba(0,0,0,0.35)] md:p-6">
+      <section className="mx-auto grid w-full max-w-7xl gap-8 px-5 pb-14 lg:grid-cols-[minmax(0,1fr)_360px]">
+        <div className="studio-surface p-5 md:p-8">
           <WorkflowStepper currentStep={isGenerating ? "generate" : workflowStep} />
           <div className="mb-5 flex items-start justify-between gap-4">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/60">Creative Workbench</p>
-              <h2 className="mt-2 text-2xl font-semibold text-zinc-50">方向输入</h2>
-              <p className="mt-3 text-sm leading-6 text-zinc-500">
+              <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/50">Creative Workbench</p>
+              <h2 className="mt-3 text-3xl font-semibold text-zinc-50 md:text-4xl">创意简报输入台</h2>
+              <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-500">
                 不用写完整方案，一句话、几张参考图，或一个模糊感觉都可以开始。
               </p>
             </div>
@@ -397,12 +397,12 @@ export function InputComposer() {
             ) : null}
           </div>
 
-          <div className="border border-white/10 bg-black/30 p-3">
+          <div className="bg-black/25 p-4 md:p-5">
             <textarea
               value={brief}
               onChange={(event) => setBrief(event.target.value)}
               placeholder="粘贴你的项目 brief、灵感片段、画面想法或客户需求。例如：我想做一组偏未来感、高反差、冷色金属质感的汽车广告视觉……"
-              className="min-h-56 w-full resize-y bg-transparent p-2 text-base leading-8 text-zinc-100 outline-none placeholder:text-zinc-600"
+              className="min-h-72 w-full resize-y bg-transparent text-lg leading-9 text-zinc-100 outline-none placeholder:text-zinc-600"
             />
           </div>
 
@@ -412,7 +412,7 @@ export function InputComposer() {
             </div>
           ) : null}
 
-          <div className="mt-6 grid gap-6">
+          <div className="mt-8 grid gap-7">
             <ImageUploader images={referenceImages} onChange={setReferenceImages} />
             <AdvancedSettingsPanel summary={`${aiProvider} · ${aiModel}`}>
               <AIProviderSelector
@@ -456,19 +456,19 @@ export function InputComposer() {
             </p>
           ) : null}
 
-          <div className="mt-7 flex flex-wrap items-center gap-3 border-t border-white/10 pt-5">
+          <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6">
             <button
               type="button"
               onClick={runGenerate}
               disabled={isGenerating}
-              className="border border-cyan-100/40 bg-zinc-50 px-6 py-3 text-sm font-medium text-black shadow-[0_0_36px_rgba(34,211,238,0.12)] transition hover:bg-cyan-100 disabled:cursor-not-allowed disabled:opacity-60"
+              className="border border-zinc-50/70 bg-zinc-50 px-7 py-3.5 text-sm font-medium text-black shadow-[0_0_40px_rgba(226,232,240,0.10)] transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isGenerating ? "正在压缩方向…" : "压缩成方向"}
             </button>
             <button
               type="button"
               onClick={clearInput}
-              className="border border-white/10 px-5 py-3 text-sm text-zinc-400 transition hover:text-zinc-100"
+              className="border border-white/10 bg-white/[0.02] px-5 py-3 text-sm text-zinc-400 transition hover:text-zinc-100"
             >
               清空输入
             </button>
@@ -495,7 +495,7 @@ export function InputComposer() {
       <ExamplePrompts onSelect={fillExample} />
       <ProductIntro />
 
-      <div ref={resultRef} className="mx-auto w-full max-w-6xl px-5 pb-20">
+      <div ref={resultRef} className="mx-auto w-full max-w-7xl px-5 pb-20">
         {isGenerating ? (
           <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
         ) : result && resultInput ? (

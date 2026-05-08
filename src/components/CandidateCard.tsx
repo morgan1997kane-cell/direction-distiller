@@ -17,7 +17,7 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
   );
 
   return (
-    <article className="flex min-w-[18rem] flex-col bg-[#101216]/85 p-5 transition hover:bg-[#13161b]/90">
+    <article className="flex min-w-[18rem] flex-col bg-[#101216]/75 p-5 transition hover:bg-[#14171b]/85 md:p-6">
       <div className="flex flex-wrap items-center gap-3">
         <span className={`whitespace-nowrap border px-3 py-1 text-xs ${typeTone[candidate.type]}`}>
           {candidate.type}
@@ -29,7 +29,7 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
         <h3 className="whitespace-normal break-words text-2xl font-medium leading-snug text-zinc-50">
           {candidate.title}
         </h3>
-        <p className="mt-4 whitespace-normal break-words text-base leading-8 text-zinc-300">
+          <p className="mt-4 whitespace-normal break-words text-base leading-8 text-zinc-300">
           {candidate.one_line_concept}
         </p>
       </div>
@@ -52,8 +52,8 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
 
       <div className="mt-7 border-t border-white/10 pt-5">
         <div className="mb-4 flex items-end justify-between gap-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Direction Score</p>
-          <p className="font-mono text-2xl text-zinc-100">{average}</p>
+          <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Direction Fit</p>
+          <p className="font-mono text-xl text-zinc-300">{average}</p>
         </div>
         <ScoreBars scores={candidate.scores} />
       </div>

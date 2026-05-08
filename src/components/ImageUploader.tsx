@@ -45,7 +45,7 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
         <span className="text-xs text-zinc-500">{images.length}/6</span>
       </div>
 
-      <label className="group flex min-h-36 cursor-pointer flex-col items-center justify-center border border-dashed border-white/15 bg-black/20 px-5 py-7 text-center transition hover:border-cyan-300/35 hover:bg-cyan-300/[0.035]">
+      <label className="group flex min-h-44 cursor-pointer flex-col items-center justify-center border border-dashed border-white/10 bg-white/[0.018] px-5 py-8 text-center transition hover:border-cyan-100/30 hover:bg-cyan-100/[0.025]">
         <input
           className="sr-only"
           type="file"
@@ -63,13 +63,13 @@ export function ImageUploader({ images, onChange }: ImageUploaderProps) {
       {images.length > 0 ? (
         <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
           {images.map((image) => (
-            <div key={image.id} className="group relative overflow-hidden border border-white/10 bg-zinc-950">
+            <div key={image.id} className="group relative overflow-hidden border border-white/10 bg-zinc-950/70">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img src={image.previewUrl} alt={image.fileName} className="h-28 w-full object-cover" />
               <button
                 type="button"
                 onClick={() => onChange(images.filter((item) => item.id !== image.id))}
-                className="absolute right-2 top-2 rounded-full border border-white/20 bg-black/70 px-2 py-1 text-xs text-zinc-100 opacity-90 transition hover:border-red-300/60 hover:text-red-100"
+                className="absolute right-2 top-2 border border-white/15 bg-black/70 px-2 py-1 text-xs text-zinc-100 opacity-90 transition hover:border-red-300/60 hover:text-red-100"
               >
                 删除
               </button>

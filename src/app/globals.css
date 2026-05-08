@@ -1,8 +1,8 @@
 @import "tailwindcss";
 
 :root {
-  --background: #08090b;
-  --foreground: #ededed;
+  --background: #090a0c;
+  --foreground: #f2f0eb;
 }
 
 @theme inline {
@@ -16,6 +16,7 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", "PingFang SC", "Microsoft YaHei", sans-serif;
+  text-rendering: geometricPrecision;
 }
 
 body::before {
@@ -24,10 +25,10 @@ body::before {
   z-index: -2;
   content: "";
   background:
-    radial-gradient(circle at 18% 9%, rgba(148, 163, 184, 0.15), transparent 30rem),
-    radial-gradient(circle at 72% 12%, rgba(103, 232, 249, 0.07), transparent 28rem),
-    radial-gradient(circle at 45% 68%, rgba(120, 113, 108, 0.08), transparent 34rem),
-    linear-gradient(180deg, #111318 0%, #08090b 42%, #0d0d0f 100%);
+    radial-gradient(circle at 18% 6%, rgba(212, 208, 196, 0.13), transparent 30rem),
+    radial-gradient(circle at 76% 12%, rgba(125, 173, 185, 0.09), transparent 34rem),
+    radial-gradient(circle at 54% 76%, rgba(115, 109, 101, 0.1), transparent 42rem),
+    linear-gradient(180deg, #15171b 0%, #090a0c 40%, #101112 100%);
 }
 
 body::after {
@@ -36,11 +37,11 @@ body::after {
   z-index: -1;
   pointer-events: none;
   content: "";
-  background-image:
-    linear-gradient(rgba(255, 255, 255, 0.018) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(255, 255, 255, 0.014) 1px, transparent 1px);
-  background-size: 96px 96px;
-  mask-image: linear-gradient(to bottom, black, transparent 62%);
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 28rem),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.025) 1px, transparent 1px);
+  background-size: auto, 140px 140px;
+  mask-image: linear-gradient(to bottom, black, transparent 54%);
 }
 
 ::selection {
@@ -54,11 +55,23 @@ textarea {
 }
 
 .studio-surface {
-  background: linear-gradient(145deg, rgba(255, 255, 255, 0.07), rgba(255, 255, 255, 0.025));
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 40px 140px rgba(0, 0, 0, 0.28);
+  background:
+    linear-gradient(145deg, rgba(255, 255, 255, 0.075), rgba(255, 255, 255, 0.026)),
+    rgba(13, 14, 16, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.075);
+  box-shadow: 0 44px 130px rgba(0, 0, 0, 0.34);
 }
 
 .editorial-section {
   border-top: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.soft-panel {
+  background: rgba(255, 255, 255, 0.035);
+  border: 1px solid rgba(255, 255, 255, 0.07);
+}
+
+.quiet-panel {
+  background: rgba(255, 255, 255, 0.022);
+  border: 1px solid rgba(255, 255, 255, 0.055);
 }

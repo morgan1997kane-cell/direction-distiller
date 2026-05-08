@@ -344,14 +344,13 @@ export function InputComposer() {
   }
 
   return (
-    <main>
+    <main className="overflow-hidden">
       <Hero />
-      <ValueFlow />
       <VersionBadge />
 
       {draftToRecover ? (
-        <section className="mx-auto mb-6 w-full max-w-7xl px-5">
-          <div className="flex flex-col gap-3 border border-cyan-200/20 bg-cyan-300/[0.06] p-4 md:flex-row md:items-center md:justify-between">
+        <section className="mx-auto mb-8 w-full max-w-7xl px-5">
+          <div className="quiet-panel flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm text-cyan-50">检测到上次未保存的生成结果，是否恢复？</p>
               <p className="mt-1 text-xs text-zinc-500">
@@ -362,7 +361,7 @@ export function InputComposer() {
               <button
                 type="button"
                 onClick={() => restoreCurrentDraft(draftToRecover)}
-                className="border border-cyan-200/30 bg-cyan-300/10 px-4 py-2 text-sm text-cyan-50 transition hover:bg-cyan-300/15"
+                className="border border-cyan-200/25 bg-cyan-300/[0.08] px-4 py-2 text-sm text-cyan-50 transition hover:bg-cyan-300/15"
               >
                 恢复上次结果
               </button>
@@ -378,31 +377,35 @@ export function InputComposer() {
         </section>
       ) : null}
 
-      <section className="mx-auto grid w-full max-w-7xl gap-8 px-5 pb-14 lg:grid-cols-[minmax(0,1fr)_360px]">
-        <div className="studio-surface p-5 md:p-8">
+      <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 pb-20 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+        <div className="studio-surface p-5 md:p-8 lg:p-10">
           <WorkflowStepper currentStep={isGenerating ? "generate" : workflowStep} />
-          <div className="mb-5 flex items-start justify-between gap-4">
+          <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
             <div>
-              <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/50">Creative Workbench</p>
-              <h2 className="mt-3 text-3xl font-semibold text-zinc-50 md:text-4xl">创意简报输入台</h2>
-              <p className="mt-4 max-w-2xl text-sm leading-7 text-zinc-500">
+              <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/45">Creative Workbench</p>
+              <h2 className="mt-4 text-3xl font-semibold leading-tight text-zinc-50 md:text-5xl">创意简报输入台</h2>
+              <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-400">
                 不用写完整方案，一句话、几张参考图，或一个模糊感觉都可以开始。
               </p>
             </div>
             {isGenerating ? (
-              <div className="flex shrink-0 items-center gap-2 border border-cyan-200/20 bg-cyan-300/[0.07] px-3 py-2 text-sm text-cyan-100">
+              <div className="quiet-panel flex w-fit shrink-0 items-center gap-2 px-3 py-2 text-sm text-cyan-100">
                 <span className="h-2 w-2 animate-pulse rounded-full bg-cyan-200" />
                 {generationStages[generationStageIndex]}
               </div>
             ) : null}
           </div>
 
-          <div className="bg-black/25 p-4 md:p-5">
+          <div className="soft-panel p-5 md:p-6">
+            <div className="mb-4 flex items-center justify-between gap-3">
+              <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Brief</p>
+              <p className="text-xs text-zinc-600">{brief.trim().length} chars</p>
+            </div>
             <textarea
               value={brief}
               onChange={(event) => setBrief(event.target.value)}
               placeholder="粘贴你的项目 brief、灵感片段、画面想法或客户需求。例如：我想做一组偏未来感、高反差、冷色金属质感的汽车广告视觉……"
-              className="min-h-72 w-full resize-y bg-transparent text-lg leading-9 text-zinc-100 outline-none placeholder:text-zinc-600"
+              className="min-h-80 w-full resize-y bg-transparent text-lg leading-9 text-zinc-100 outline-none placeholder:text-zinc-600 md:min-h-96"
             />
           </div>
 
@@ -412,8 +415,31 @@ export function InputComposer() {
             </div>
           ) : null}
 
-          <div className="mt-8 grid gap-7">
-            <ImageUploader images={referenceImages} onChange={setReferenceImages} />
+          <div className="mt-10 grid gap-9">
+            <div className="grid gap-8 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+              <ImageUploader images={referenceImages} onChange={setReferenceImages} />
+              <div className="grid gap-7">
+                <OptionChips
+                  label="项目类型"
+                  options={projectTypes}
+                  value={projectType}
+                  onChange={(value) => setProjectType(value as ProjectType)}
+                />
+                <OptionChips
+                  label="输出目标"
+                  options={outputGoals}
+                  value={outputGoal}
+                  onChange={(value) => setOutputGoal(value as OutputGoal)}
+                />
+              </div>
+            </div>
+            <OptionChips
+              label="风格倾向"
+              options={styleTags}
+              value={selectedStyles}
+              multiple
+              onChange={(value) => setSelectedStyles(value as StyleTag[])}
+            />
             <AdvancedSettingsPanel summary={`${aiProvider} · ${aiModel}`}>
               <AIProviderSelector
                 provider={aiProvider}
@@ -422,25 +448,6 @@ export function InputComposer() {
                 onModelChange={updateAIModel}
               />
             </AdvancedSettingsPanel>
-            <OptionChips
-              label="项目类型"
-              options={projectTypes}
-              value={projectType}
-              onChange={(value) => setProjectType(value as ProjectType)}
-            />
-            <OptionChips
-              label="输出目标"
-              options={outputGoals}
-              value={outputGoal}
-              onChange={(value) => setOutputGoal(value as OutputGoal)}
-            />
-            <OptionChips
-              label="风格倾向"
-              options={styleTags}
-              value={selectedStyles}
-              multiple
-              onChange={(value) => setSelectedStyles(value as StyleTag[])}
-            />
           </div>
 
           {error ? <p className="mt-5 text-sm text-red-200">{error}</p> : null}
@@ -456,19 +463,19 @@ export function InputComposer() {
             </p>
           ) : null}
 
-          <div className="mt-8 flex flex-wrap items-center gap-3 border-t border-white/10 pt-6">
+          <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-white/10 pt-7">
             <button
               type="button"
               onClick={runGenerate}
               disabled={isGenerating}
-              className="border border-zinc-50/70 bg-zinc-50 px-7 py-3.5 text-sm font-medium text-black shadow-[0_0_40px_rgba(226,232,240,0.10)] transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-60"
+              className="border border-zinc-50/70 bg-zinc-50 px-8 py-4 text-sm font-medium text-black shadow-[0_0_42px_rgba(226,232,240,0.11)] transition hover:bg-cyan-50 disabled:cursor-not-allowed disabled:opacity-60"
             >
               {isGenerating ? "正在压缩方向…" : "压缩成方向"}
             </button>
             <button
               type="button"
               onClick={clearInput}
-              className="border border-white/10 bg-white/[0.02] px-5 py-3 text-sm text-zinc-400 transition hover:text-zinc-100"
+              className="border border-white/10 bg-white/[0.018] px-5 py-3 text-sm text-zinc-400 transition hover:border-white/20 hover:text-zinc-100"
             >
               清空输入
             </button>
@@ -492,10 +499,11 @@ export function InputComposer() {
         />
       </section>
 
+      <ValueFlow />
       <ExamplePrompts onSelect={fillExample} />
       <ProductIntro />
 
-      <div ref={resultRef} className="mx-auto w-full max-w-7xl px-5 pb-20">
+      <div ref={resultRef} className="mx-auto w-full max-w-7xl px-5 pb-24">
         {isGenerating ? (
           <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
         ) : result && resultInput ? (

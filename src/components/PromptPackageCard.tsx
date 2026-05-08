@@ -18,7 +18,7 @@ export function PromptPackageCard({ promptPackage }: { promptPackage: PromptPack
   }
 
   return (
-    <section className="bg-[#101216]/80 p-5 md:p-7">
+    <section className="quiet-panel bg-[#101216]/60 p-5 md:p-7">
       <div className="flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-zinc-600">Prompt Draft</p>
@@ -29,7 +29,7 @@ export function PromptPackageCard({ promptPackage }: { promptPackage: PromptPack
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
-          <div className="flex border border-white/10 bg-black/25 p-1">
+          <div className="flex border border-white/10 bg-black/20 p-1">
             <TabButton active={language === "zh"} onClick={() => setLanguage("zh")}>
               中文版
             </TabButton>
@@ -40,14 +40,14 @@ export function PromptPackageCard({ promptPackage }: { promptPackage: PromptPack
           <button
             type="button"
             onClick={copyActivePrompt}
-            className="border border-white/10 bg-white/[0.025] px-3 py-2 text-xs text-zinc-300 transition hover:border-cyan-200/25 hover:text-cyan-50"
+            className="border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-zinc-400 transition hover:border-cyan-100/25 hover:text-cyan-50"
           >
             {copied ? "已复制" : "复制当前版本"}
           </button>
         </div>
       </div>
 
-      <div className="mt-7 bg-black/30 p-4">
+      <div className="mt-7 bg-black/[0.24] p-4">
         <p className="mb-3 text-xs text-zinc-500">{language === "zh" ? "主 Prompt" : "Main Prompt"}</p>
         <p className="font-mono text-xs leading-6 text-zinc-300">{active.main_prompt}</p>
       </div>
@@ -82,7 +82,7 @@ function TabButton({ active, children, onClick }: { active: boolean; children: R
       onClick={onClick}
       className={[
         "px-3 py-1.5 text-xs transition",
-        active ? "bg-cyan-300/10 text-cyan-50" : "text-zinc-500 hover:text-zinc-200",
+        active ? "bg-cyan-100/[0.08] text-cyan-50" : "text-zinc-500 hover:text-zinc-200",
       ].join(" ")}
     >
       {children}

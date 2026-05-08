@@ -30,10 +30,10 @@ export function AIProviderSelector({
   }, []);
 
   return (
-    <section className="bg-black/15 p-3">
+    <section className="bg-black/[0.15] p-3">
       <div className="mb-3 flex items-center justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.22em] text-cyan-100/45">AI Settings</p>
+          <p className="text-xs uppercase tracking-[0.22em] text-zinc-600">AI Settings</p>
           <h3 className="mt-1 text-sm font-medium text-zinc-200">Provider / Model</h3>
         </div>
         <span className="text-xs text-zinc-600">{provider === "demo" ? "Local" : provider === "ollama" ? "Local API" : "Live API"}</span>
@@ -45,7 +45,7 @@ export function AIProviderSelector({
           <select
             value={provider}
             onChange={(event) => onProviderChange(event.target.value as AIProvider)}
-            className="h-10 border border-white/10 bg-[#0d0f12] px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-200/35"
+            className="h-10 border border-white/10 bg-[#0d0f12] px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-100/30"
           >
             {SUPPORTED_PROVIDERS.map((item) => (
               <option key={item} value={item}>
@@ -61,7 +61,7 @@ export function AIProviderSelector({
             value={(modelOptions as readonly string[]).includes(model) ? model : getDefaultModel(provider)}
             onChange={(event) => onModelChange(event.target.value)}
             disabled={provider === "demo"}
-            className="h-10 border border-white/10 bg-[#0d0f12] px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-200/35 disabled:cursor-not-allowed disabled:text-zinc-600"
+            className="h-10 border border-white/10 bg-[#0d0f12] px-3 text-sm text-zinc-200 outline-none transition hover:border-white/20 focus:border-cyan-100/30 disabled:cursor-not-allowed disabled:text-zinc-600"
           >
             {modelOptions.map((item) => (
               <option key={item} value={item}>

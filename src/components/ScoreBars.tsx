@@ -18,7 +18,7 @@ export function ScoreBars({ scores }: { scores: DirectionScores }) {
           </div>
           <div className="h-1 overflow-hidden bg-white/10">
             <div
-              className="h-full bg-gradient-to-r from-zinc-400 via-cyan-200 to-zinc-100"
+              className="h-full bg-gradient-to-r from-zinc-500 via-cyan-100/70 to-zinc-200"
               style={{ width: `${scores[key]}%` }}
             />
           </div>

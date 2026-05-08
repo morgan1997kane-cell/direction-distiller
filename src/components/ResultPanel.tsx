@@ -161,22 +161,22 @@ export function ResultPanel({
   }
 
   return (
-    <section className="space-y-4 pb-36">
-      <header className="pb-8">
+    <section className="space-y-5 pb-40">
+      <header className="pb-10 pt-6">
         <div className="flex flex-wrap items-center justify-between gap-3">
-          <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/50">Distilled Proposal</p>
-          <span className="border border-white/10 bg-white/[0.03] px-2.5 py-1 text-xs uppercase tracking-[0.18em] text-zinc-400">
+          <p className="text-xs uppercase tracking-[0.3em] text-cyan-100/45">Direction Board</p>
+          <span className="quiet-panel px-2.5 py-1 text-xs uppercase tracking-[0.18em] text-zinc-500">
             AI Mode: {result.ai_mode === "live" ? liveLabel : "Demo"}
           </span>
         </div>
-        <h2 className="mt-4 text-4xl font-semibold leading-tight text-zinc-50 md:text-5xl">方向提案板</h2>
-        <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-400">
+        <h2 className="mt-5 text-4xl font-semibold leading-tight text-zinc-50 md:text-6xl">方向提案板</h2>
+        <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-400">
           建议先检查推荐方向。如果方向基本成立，再进入局部编辑、Prompt 优化或导出。
         </p>
         {notice ? <p className="mt-3 text-sm text-amber-100/80">{notice}</p> : null}
       </header>
 
-      <section className="bg-white/[0.025] p-5 md:p-6">
+      <section className="quiet-panel p-5 md:p-6">
         <div className="grid gap-4 md:grid-cols-5">
           <SummaryItem label="项目类型" value={result.project_type} />
           <SummaryItem label="输出目标" value={result.output_goal} />
@@ -199,7 +199,7 @@ export function ResultPanel({
         >
           <div className="grid gap-3 md:grid-cols-2">
             {result.reference_image_summary.map((image) => (
-              <div key={image.image_id} className="min-w-0 bg-black/20 p-4">
+              <div key={image.image_id} className="quiet-panel min-w-0 p-4">
                 <p className="truncate text-sm text-zinc-200">{image.file_name}</p>
                 <p className="mt-2 text-xs leading-5 text-zinc-500">
                   {image.observed_style} · {image.color_tone} · {image.composition_notes}
@@ -242,7 +242,7 @@ export function ResultPanel({
         summary={`3 个候选 · ${result.candidate_directions.map((candidate) => candidate.type).join(" / ")}`}
         defaultExpanded
       >
-        <div className="grid items-start gap-5 xl:grid-cols-2 2xl:grid-cols-3">
+        <div className="grid items-start gap-5 xl:grid-cols-2">
           {result.candidate_directions.map((candidate, index) => (
             <EditableSection<DirectionCandidate>
               key={candidate.id}
@@ -381,7 +381,7 @@ export function ResultPanel({
 
       <ExportPanel result={result} onExport={onExport} />
 
-      <div className="sticky bottom-4 z-20 flex max-h-32 flex-wrap gap-2 overflow-y-auto border border-white/10 bg-[#090a0d]/88 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-md">
+      <div className="sticky bottom-4 z-20 flex max-h-32 flex-wrap gap-2 overflow-y-auto border border-white/10 bg-[#090a0d]/90 p-3 shadow-[0_20px_80px_rgba(0,0,0,0.35)] backdrop-blur-md">
         <ActionButton onClick={() => copyText(formatDirectionMarkdown(result))}>复制方向包</ActionButton>
         <ActionButton onClick={() => copyText(formatPromptMarkdown(result))}>复制 Prompt</ActionButton>
         <ActionButton onClick={onSave}>{saved ? "已保存到 Archive" : edited ? "保存修改到 Archive" : "保存到 Project Archive"}</ActionButton>
@@ -420,7 +420,7 @@ function ActionButton({
         "border px-4 py-2 text-sm transition",
         muted
           ? "border-white/10 bg-white/[0.025] text-zinc-400 hover:text-zinc-100"
-          : "border-cyan-200/25 bg-cyan-300/[0.08] text-cyan-50 hover:bg-cyan-300/12",
+          : "border-cyan-200/25 bg-cyan-300/[0.08] text-cyan-50 hover:bg-cyan-300/[0.12]",
       ].join(" ")}
     >
       {children}

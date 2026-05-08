@@ -8,9 +8,9 @@ const rows: Array<[keyof ExecutionAdvice, string, string]> = [
 
 export function ExecutionAdviceCard({ advice }: { advice: ExecutionAdvice }) {
   return (
-    <section className="bg-white/[0.025] p-5 md:p-7">
+    <section className="quiet-panel p-5 md:p-8">
       <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Action Plan</p>
-      <h2 className="mt-3 text-3xl font-semibold text-zinc-50">下一步执行建议</h2>
+      <h2 className="mt-3 text-3xl font-semibold text-zinc-50 md:text-4xl">下一步执行建议</h2>
       <div className="mt-7 grid gap-4 md:grid-cols-3">
         {rows.map(([key, title, index]) => (
           <article key={key} className="border-t border-white/10 pt-5">

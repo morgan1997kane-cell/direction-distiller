@@ -39,11 +39,11 @@ export function ExportPanel({ result, onExport }: ExportPanelProps) {
   }
 
   return (
-    <section className="border border-white/10 bg-white/[0.025] p-4">
+    <section className="quiet-panel p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/45">Export</p>
-          <h3 className="mt-1 text-base font-medium text-zinc-100">导出方向包</h3>
+          <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/38">Export</p>
+          <h3 className="mt-2 text-lg font-medium text-zinc-100">导出方向包</h3>
           <p className="mt-1 text-xs leading-5 text-zinc-500">复制或下载当前结果，不会改动草稿、历史记录或生成内容。</p>
         </div>
         {notice ? <p className="text-xs text-cyan-100/80">{notice}</p> : null}
@@ -64,7 +64,7 @@ function ExportButton({ children, onClick }: { children: React.ReactNode; onClic
     <button
       type="button"
       onClick={onClick}
-      className="border border-white/10 bg-black/25 px-3 py-2 text-sm text-zinc-300 transition hover:border-cyan-200/40 hover:bg-cyan-300/10 hover:text-cyan-50"
+      className="border border-white/10 bg-black/20 px-3 py-2 text-sm text-zinc-400 transition hover:border-cyan-100/30 hover:bg-cyan-100/[0.07] hover:text-cyan-50"
     >
       {children}
     </button>

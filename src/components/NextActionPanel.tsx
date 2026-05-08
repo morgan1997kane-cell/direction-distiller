@@ -35,7 +35,7 @@ export function NextActionPanel({ step, result, saved = false, edited = false }:
       ];
 
   return (
-    <section className="border-l border-cyan-200/20 bg-cyan-300/[0.035] px-5 py-4">
+    <section className="quiet-panel border-l-cyan-100/20 px-5 py-4">
       <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/45">Next Action</p>

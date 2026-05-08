@@ -18,8 +18,8 @@ export function WorkflowStepper({ currentStep }: WorkflowStepperProps) {
   const activeIndex = steps.findIndex((step) => step.id === currentStep);
 
   return (
-    <nav className="mb-8 overflow-x-auto border-b border-white/10 pb-4" aria-label="Direction workflow">
-      <ol className="flex min-w-max items-center gap-3">
+    <nav className="mb-9 overflow-x-auto border-b border-white/10 pb-5" aria-label="Direction workflow">
+      <ol className="flex min-w-max items-center gap-2">
         {steps.map((step, index) => {
           const isActive = step.id === currentStep;
           const isComplete = index < activeIndex;
@@ -30,9 +30,9 @@ export function WorkflowStepper({ currentStep }: WorkflowStepperProps) {
                 className={[
                   "flex items-center gap-2 border px-3 py-2 transition",
                   isActive
-                    ? "border-cyan-200/40 bg-cyan-300/[0.075] text-cyan-50"
+                    ? "border-cyan-100/30 bg-cyan-100/[0.065] text-cyan-50"
                     : isComplete
-                      ? "border-white/10 bg-white/[0.025] text-zinc-300"
+                      ? "border-white/10 bg-white/[0.022] text-zinc-300"
                       : "border-white/10 bg-transparent text-zinc-600",
                 ].join(" ")}
               >

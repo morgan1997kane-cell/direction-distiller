@@ -328,6 +328,7 @@ DeepSeek 推荐国内用户优先使用，支持国内充值。Gemini 可用于�
 - Hero, Creative Workbench, Direction Board, Project Archive, and product explanation sections should use stronger whitespace, softer hierarchy, fewer hard borders, and clearer editorial rhythm.
 - Provider / model controls remain available but should stay visually secondary inside advanced AI engine settings.
 - Result pages should prioritize Recommended Direction and Candidate Directions, while Prompt, Execution Advice, and technical details stay progressively disclosed.
+- v0.4.6 keeps the existing MVP feature set intact while making the page more concise, editorial, and proposal-like: softer dark surfaces, lower-density chips, a larger brief workbench, subdued AI Engine settings, and clearer long-page result hierarchy.
 
 ## Current Version History
 

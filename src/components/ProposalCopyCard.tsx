@@ -8,9 +8,9 @@ const copyRows: Array<[keyof ProposalCopy, string, string]> = [
 
 export function ProposalCopyCard({ proposalCopy }: { proposalCopy: ProposalCopy }) {
   return (
-    <section className="bg-white/[0.025] p-5 md:p-7">
+    <section className="quiet-panel p-5 md:p-8">
       <p className="text-xs uppercase tracking-[0.24em] text-zinc-500">Proposal Copy</p>
-      <h2 className="mt-3 text-3xl font-semibold text-zinc-50">提案文案</h2>
+      <h2 className="mt-3 text-3xl font-semibold text-zinc-50 md:text-4xl">提案文案</h2>
       <div className="mt-7 grid gap-4">
         {copyRows.map(([key, title, label]) => (
           <article key={key} className="border-t border-white/10 pt-5">

@@ -22,15 +22,19 @@ Direction Distiller 不是普通灵感笔记，也不是聊天式脑暴工具。
 - 默认使用服务端 DeepSeek API 生成结果
 - 可通过环境变量切换到 Gemini 或 OpenAI-compatible 供应商
 - 可在页面中手动切换 provider / model
+- 支持 Local / Ollama 作为本地开发 provider
 - 无 API key 或 API 失败时 fallback 到本地 mock generator
 - 生成 3 个视觉方向候选
 - 生成 1 个推荐方向
 - 生成视觉方向包、提案文案、Prompt 草稿和下一步执行建议
+- 支持中英双版本 Prompt Package
+- 支持 section editing、局部重生成和字段化编辑
 - 复制完整方向包
 - 复制 Prompt
-- 保存历史记录到 localStorage
-- 从历史记录恢复结果
-- 删除历史记录
+- 自动保存当前草稿，并支持刷新后的恢复 / 丢弃
+- 支持 Project Archive：保存、搜索、筛选、收藏、重命名、恢复、删除和 Markdown 复制
+- 支持 Markdown、客户版和内部执行版导出
+- v0.4.6 完成 Visual System Refresh：更简洁凝练的长页面布局、更弱化的高级设置、更清晰的结果页层级，以及更偏创意产品 / 提案展示的视觉语言
 
 ## Tech Stack
 

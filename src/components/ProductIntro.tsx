@@ -18,12 +18,12 @@ const outputs = [
 
 export function ProductIntro() {
   return (
-    <section className="mx-auto w-full max-w-7xl px-5 pb-16">
-      <div className="border-y border-white/10 py-14">
+    <section className="mx-auto w-full max-w-7xl px-5 pb-20">
+      <div className="border-y border-white/10 py-16">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_420px]">
           <div>
             <p className="text-xs uppercase tracking-[0.28em] text-cyan-200/45">Why Direction Distiller</p>
-            <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight text-zinc-50 md:text-5xl">
+            <h2 className="mt-5 max-w-3xl text-4xl font-semibold leading-tight text-zinc-50 md:text-6xl">
               不是多生成几张图，而是更快形成判断。
             </h2>
             <div className="mt-8 max-w-3xl space-y-5 text-base leading-8 text-zinc-400">
@@ -53,7 +53,7 @@ function IntroList({ title, items }: { title: string; items: string[] }) {
       <h3 className="text-sm font-medium text-zinc-100">{title}</h3>
       <div className="mt-4 flex flex-wrap gap-2">
         {items.map((item) => (
-          <span key={item} className="border border-white/10 bg-black/20 px-2.5 py-1.5 text-xs text-zinc-400">
+          <span key={item} className="border border-white/10 bg-black/[0.16] px-2.5 py-1.5 text-xs text-zinc-400">
             {item}
           </span>
         ))}

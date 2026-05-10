@@ -18,7 +18,7 @@ export function WorkflowStepper({ currentStep }: WorkflowStepperProps) {
   const activeIndex = steps.findIndex((step) => step.id === currentStep);
 
   return (
-    <nav className="mb-9 overflow-x-auto border-b border-white/10 pb-5" aria-label="Direction workflow">
+    <nav className="mb-9 max-w-full overflow-x-auto border-b border-white/10 pb-5" aria-label="Direction workflow">
       <ol className="flex min-w-max items-center gap-2">
         {steps.map((step, index) => {
           const isActive = step.id === currentStep;

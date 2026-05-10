@@ -378,7 +378,7 @@ export function InputComposer() {
       ) : null}
 
       <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 pb-20 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
-        <div className="studio-surface p-5 md:p-8 lg:p-10">
+        <div className="studio-surface min-w-0 p-5 md:p-8 lg:p-10">
           <WorkflowStepper currentStep={isGenerating ? "generate" : workflowStep} />
           <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
             <div>

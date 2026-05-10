@@ -16,7 +16,13 @@ Direction Distiller / 方向压缩器 是一个面向泛视觉设计师的 AI �
 
 把模糊灵感压缩成可提案的视觉方向。
 
-当前版本是 v0.4.6：在完整多 provider、归档、导出、自动保存和局部编辑能力之上，完成 Visual System Refresh，让界面更接近创意产品和提案长页面。
+当前最新版本是 v0.4.6.1 · Regression & Clarity Patch：在 v0.4.6 Visual System Refresh 之上，完成回归验证后的移动端布局修复与体验稳定性同步。
+
+最新提交：
+
+```text
+0a6df11 Fix mobile workflow overflow regression
+```
 
 ## Target Users
 
@@ -53,6 +59,16 @@ Direction Distiller / 方向压缩器 是一个面向泛视觉设计师的 AI �
 - 保存历史记录到 localStorage
 - 从历史记录恢复结果
 - 删除历史记录
+- Creative Workbench 输入与 Starter Briefs
+- Demo / DeepSeek / Gemini / OpenAI / Ollama provider
+- Live API fallback 到 Demo
+- Project Archive
+- Current Draft autosave / recovery
+- Section Editing 字段化编辑
+- Partial Regeneration
+- Markdown / 客户版 / 内部版导出
+- Guided Workflow + Next Action Panel
+- 移动端 Workflow Stepper 溢出已修复
 
 ## Important Product Positioning
 
@@ -360,6 +376,7 @@ v0.4.3.3: live response compatibility hotfix for bilingual Prompt Package normal
 v0.4.4: export-ready deliverable output with Markdown download, client copy, and internal production copy.
 v0.4.5: project archive upgrade with search, rename, favorite, restore, delete, and Markdown copy.
 v0.4.6: guided workflow, next action system, and visual system refresh with a more editorial long-page layout.
+v0.4.6.1: regression and clarity patch. Fixed mobile Creative Workbench overflow caused by the horizontal Workflow Stepper. `InputComposer.tsx` Workbench container now uses `min-w-0`; `WorkflowStepper.tsx` nav now uses `max-w-full`. 390px viewport verification: `scrollWidth=390` before and after generation. Verified Starter Briefs, Demo generation, DeepSeek fallback, Section Editing, Partial Regeneration, Export, Project Archive, and Autosave / Recovery.
 
 相关 Git 提交记录中应包含：
 
@@ -427,12 +444,37 @@ v0.4.6: guided workflow, next action system, and visual system refresh with a mo
 
 当前下一步优先级：
 
-1. 先稳定现有原型
-2. 再审查线上体验
-3. 再决定是否继续做 UI 细修
-4. 再准备第一条自媒体内容
-5. 真实 AI API 已进入 v0.3，下一步先验证稳定性和线上体验
-6. Skill / Image 2.0 / Deep Research / Agent 模式暂时都不是当前第一优先级
+1. 推进 v0.4.7 · Single Project Workspace。
+2. 让从 Project Archive 恢复 / 打开的项目进入更明确的 active project / proposal case 工作区体验。
+3. 增加 Project Header、项目元信息、返回 Archive、导出入口、收藏状态。
+4. 让 Archive 与当前工作区关系更清楚。
+5. 继续稳定现有 localStorage 原型，不引入登录、数据库、云同步或新 provider。
+6. Skill / Image 2.0 / Deep Research / Agent 模式暂时都不是当前第一优先级。
+
+## v0.4.6.1 Regression & Clarity Patch
+
+- 修复移动端 Creative Workbench 被 Workflow Stepper 横向步骤条撑宽的问题。
+- `InputComposer.tsx` 中 Workbench 容器增加 `min-w-0`。
+- `WorkflowStepper.tsx` 中 `nav` 增加 `max-w-full`。
+- 390px 视口下生成前后 `scrollWidth=390`。
+- 已验证 Starter Briefs、Demo generation、DeepSeek fallback、Section Editing、Partial Regeneration、Export、Project Archive、Autosave / Recovery 均正常。
+
+## v0.4.7 Single Project Workspace
+
+下一阶段方向是 `v0.4.7 · Single Project Workspace`。
+
+目标：让从 Project Archive 恢复 / 打开的项目进入更明确的 active project / proposal case 工作区体验，包括 Project Header、项目元信息、返回 Archive、导出入口、收藏状态，并让 Archive 与当前工作区关系更清楚。
+
+边界：
+
+- 不做登录
+- 不做数据库
+- 不做云同步
+- 不接新 provider
+- 不重构 AI API
+- 不删除 Archive / Autosave / Export / Section Editing / Partial Regeneration
+- 不混入 Portfolio / Asset Organizer 功能
+- 继续使用当前 localStorage 架构
 
 ## Notes for Future Codex Sessions
 

@@ -11,6 +11,7 @@ import { HistoryPanel } from "@/components/HistoryPanel";
 import { ImageUploader } from "@/components/ImageUploader";
 import { OptionChips } from "@/components/OptionChips";
 import { ProductIntro } from "@/components/ProductIntro";
+import { ProjectWorkspaceHeader } from "@/components/ProjectWorkspaceHeader";
 import { ResultPanel } from "@/components/ResultPanel";
 import { VersionBadge } from "@/components/VersionBadge";
 import { ValueFlow } from "@/components/ValueFlow";
@@ -124,9 +125,11 @@ export function InputComposer() {
   const [aiProvider, setAiProvider] = useState<AIProvider>(defaultAIProvider);
   const [aiModel, setAiModel] = useState<string>(getDefaultModel(defaultAIProvider));
   const [savedResultId, setSavedResultId] = useState("");
+  const [activeProjectId, setActiveProjectId] = useState("");
   const [workflowStep, setWorkflowStep] = useState<WorkflowStep>("input");
   const [hasEditedResult, setHasEditedResult] = useState(false);
   const resultRef = useRef<HTMLDivElement>(null);
+  const archiveRef = useRef<HTMLDivElement>(null);
 
   const currentInput: DirectionInput = {
     brief,
@@ -135,6 +138,7 @@ export function InputComposer() {
     outputGoal,
     styleTags: selectedStyles,
   };
+  const activeProject = activeProjectId ? history.find((item) => item.id === activeProjectId) : null;
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -228,6 +232,7 @@ export function InputComposer() {
     setError("");
     setNotice("");
     setSavedResultId("");
+    setActiveProjectId("");
     setWorkflowStep("generate");
     setHasEditedResult(false);
     setGenerationStageIndex(0);
@@ -269,10 +274,11 @@ export function InputComposer() {
 
   function saveCurrent() {
     if (!result || !resultInput) return;
-    const existing = history.find((item) => item.id === savedResultId);
+    const existing = history.find((item) => item.id === (savedResultId || activeProjectId));
     const item = createArchiveItem(result, resultInput, existing);
     setHistory(saveArchiveItem(item));
     setSavedResultId(item.id);
+    setActiveProjectId(item.id);
     setWorkflowStep("archive");
     setHasEditedResult(false);
     autosaveResult(result, resultInput);
@@ -288,6 +294,7 @@ export function InputComposer() {
     setResult(item.result);
     setResultInput(item.input);
     setSavedResultId(item.id);
+    setActiveProjectId(item.id);
     setWorkflowStep("refine");
     setHasEditedResult(false);
     if (item.provider && isSupportedProvider(item.provider)) {
@@ -313,6 +320,7 @@ export function InputComposer() {
     setResult(draft.result);
     setResultInput(draft.inputState);
     setSavedResultId("");
+    setActiveProjectId("");
     setWorkflowStep("refine");
     setHasEditedResult(false);
     setDraftToRecover(null);
@@ -336,6 +344,7 @@ export function InputComposer() {
     setResult(null);
     setResultInput(null);
     setSavedResultId("");
+    setActiveProjectId("");
     setWorkflowStep("input");
     setHasEditedResult(false);
     setError("");
@@ -349,7 +358,7 @@ export function InputComposer() {
       <VersionBadge />
 
       {draftToRecover ? (
-        <section className="mx-auto mb-8 w-full max-w-7xl px-5">
+        <section className="mx-auto mb-8 w-full max-w-[1600px] px-5">
           <div className="quiet-panel flex flex-col gap-3 px-5 py-4 md:flex-row md:items-center md:justify-between">
             <div>
               <p className="text-sm text-cyan-50">检测到上次未保存的生成结果，是否恢复？</p>
@@ -377,7 +386,7 @@ export function InputComposer() {
         </section>
       ) : null}
 
-      <section className="mx-auto grid w-full max-w-7xl gap-10 px-5 pb-20 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start">
+      <section className="mx-auto grid w-full max-w-[1600px] gap-10 px-5 pb-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
         <div className="studio-surface min-w-0 p-5 md:p-8 lg:p-10">
           <WorkflowStepper currentStep={isGenerating ? "generate" : workflowStep} />
           <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
@@ -482,33 +491,51 @@ export function InputComposer() {
           </div>
         </div>
 
-        <HistoryPanel
-          items={history}
-          onRestore={restoreHistory}
-          onDelete={(id) => {
-            setHistory(deleteArchiveItem(id));
-            if (savedResultId === id) setSavedResultId("");
-          }}
-          onClear={() => {
-            clearArchiveItems();
-            setHistory([]);
-            setSavedResultId("");
-          }}
-          onRename={(id, title) => setHistory(renameArchiveItem(id, title))}
-          onToggleFavorite={(id) => setHistory(toggleArchiveFavorite(id))}
-        />
+        <div ref={archiveRef} className="min-w-0">
+          <HistoryPanel
+            items={history}
+            onRestore={restoreHistory}
+            onDelete={(id) => {
+              setHistory(deleteArchiveItem(id));
+              if (savedResultId === id) setSavedResultId("");
+              if (activeProjectId === id) setActiveProjectId("");
+            }}
+            onClear={() => {
+              clearArchiveItems();
+              setHistory([]);
+              setSavedResultId("");
+              setActiveProjectId("");
+            }}
+            onRename={(id, title) => setHistory(renameArchiveItem(id, title))}
+            onToggleFavorite={(id) => setHistory(toggleArchiveFavorite(id))}
+          />
+        </div>
       </section>
 
       <ValueFlow />
       <ExamplePrompts onSelect={fillExample} />
       <ProductIntro />
 
-      <div ref={resultRef} className="mx-auto w-full max-w-7xl px-5 pb-24">
+      <div ref={resultRef} className="mx-auto w-full max-w-[1600px] px-5 pb-24">
         {isGenerating ? (
           <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
         ) : result && resultInput ? (
           <div className="space-y-6">
             <NextActionPanel step={workflowStep} result={result} saved={Boolean(savedResultId)} edited={hasEditedResult} />
+            <ProjectWorkspaceHeader
+              activeProject={activeProject}
+              result={result}
+              input={resultInput}
+              saved={Boolean(savedResultId)}
+              edited={hasEditedResult}
+              autosavedAt={autosavedAt}
+              onBackToArchive={() => archiveRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onExport={() => {
+                setWorkflowStep("export");
+                window.setTimeout(() => document.getElementById("export-panel")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+              }}
+              onToggleFavorite={(id) => setHistory(toggleArchiveFavorite(id))}
+            />
             <ResultPanel
               result={result}
               input={resultInput}

@@ -162,28 +162,28 @@ export function ResultPanel({
 
   return (
     <section className="space-y-5 pb-40">
-      <header className="pb-10 pt-6">
+      <header className="pb-8 pt-4">
         <div className="flex flex-wrap items-center justify-between gap-3">
           <p className="text-xs uppercase tracking-[0.3em] text-cyan-100/45">Direction Board</p>
           <span className="quiet-panel px-2.5 py-1 text-xs uppercase tracking-[0.18em] text-zinc-500">
             AI Mode: {result.ai_mode === "live" ? liveLabel : "Demo"}
           </span>
         </div>
-        <h2 className="mt-5 text-4xl font-semibold leading-tight text-zinc-50 md:text-6xl">方向提案板</h2>
-        <p className="mt-6 max-w-2xl text-base leading-8 text-zinc-400">
+        <h2 className="mt-5 text-4xl font-semibold leading-tight text-zinc-50 md:text-6xl">Direction Proposal</h2>
+        <p className="mt-6 max-w-3xl text-base leading-8 text-zinc-400">
           建议先检查推荐方向。如果方向基本成立，再进入局部编辑、Prompt 优化或导出。
         </p>
         {notice ? <p className="mt-3 text-sm text-amber-100/80">{notice}</p> : null}
       </header>
 
-      <section className="quiet-panel p-5 md:p-6">
+      <section className="border-y border-white/10 py-5 md:py-6">
         <div className="grid gap-4 md:grid-cols-5">
           <SummaryItem label="项目类型" value={result.project_type} />
           <SummaryItem label="输出目标" value={result.output_goal} />
           <SummaryItem label="参考图" value={`${input.referenceImages.length} 张`} />
           <SummaryItem label="风格倾向" value={result.style_tags.join("、")} wide />
         </div>
-        <p className="mt-5 border-t border-white/10 pt-5 text-sm leading-7 text-zinc-500">{result.input_summary}</p>
+        <p className="mt-5 max-w-5xl border-t border-white/10 pt-5 text-sm leading-7 text-zinc-500">{result.input_summary}</p>
       </section>
 
       {result.reference_image_summary.length > 0 ? (
@@ -242,7 +242,7 @@ export function ResultPanel({
         summary={`3 个候选 · ${result.candidate_directions.map((candidate) => candidate.type).join(" / ")}`}
         defaultExpanded
       >
-        <div className="grid items-start gap-5 xl:grid-cols-2">
+        <div className="grid min-w-0 items-start gap-5 md:grid-cols-2 xl:grid-cols-3">
           {result.candidate_directions.map((candidate, index) => (
             <EditableSection<DirectionCandidate>
               key={candidate.id}

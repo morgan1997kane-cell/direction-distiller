@@ -53,13 +53,29 @@ function readFlatPromptPackage(value: unknown, fallback: PromptLanguagePackage):
   const record = isRecord(value) ? value : {};
 
   return {
-    main_prompt: text(record.main_prompt ?? record.mainPrompt ?? record.prompt, fallback.main_prompt),
+    main_prompt: text(
+      record.main_prompt ??
+        record.mainPrompt ??
+        record.prompt ??
+        record.positive_prompt ??
+        record.positivePrompt ??
+        record.image_prompt ??
+        record.imagePrompt ??
+        record["主prompt"],
+      fallback.main_prompt,
+    ),
     variation_prompts: list(
-      record.variation_prompts ?? record.variationPrompts ?? record.variations,
+      record.variation_prompts ?? record.variationPrompts ?? record.variations ?? record.variants ?? record["变体prompt"],
       fallback.variation_prompts,
     ),
     negative_constraints: list(
-      record.negative_constraints ?? record.negativeConstraints ?? record.negative_prompt ?? record.negativePrompt,
+      record.negative_constraints ??
+        record.negativeConstraints ??
+        record.negative_prompt ??
+        record.negativePrompt ??
+        record.avoid ??
+        record.constraints ??
+        record["反向约束"],
       fallback.negative_constraints,
     ),
   };
@@ -71,6 +87,8 @@ function languagePackage(value: unknown, fallback: PromptLanguagePackage): Promp
 
 export function ensureBilingualPromptPackage(promptPackage: PromptPackage): Required<Pick<PromptPackage, "zh" | "en">> {
   const record: Record<string, unknown> = isRecord(promptPackage) ? promptPackage : {};
+  const zhSource = record.zh ?? record.cn ?? record.chinese ?? record.zh_cn ?? record.zhCN ?? record["中文"];
+  const enSource = record.en ?? record.english ?? record.en_us ?? record.enUS ?? record["英文"];
   const flatFromSource = readFlatPromptPackage(record, DEFAULT_ZH_PROMPT);
 
   const zhFallback: PromptLanguagePackage = {
@@ -81,14 +99,14 @@ export function ensureBilingualPromptPackage(promptPackage: PromptPackage): Requ
   };
 
   const enFallback: PromptLanguagePackage = {
-    main_prompt: text(record.en && isRecord(record.en) ? record.en.main_prompt : undefined, DEFAULT_EN_PROMPT.main_prompt),
+    main_prompt: text(enSource && isRecord(enSource) ? enSource.main_prompt : undefined, DEFAULT_EN_PROMPT.main_prompt),
     variation_prompts: DEFAULT_EN_PROMPT.variation_prompts,
     negative_constraints: DEFAULT_EN_PROMPT.negative_constraints,
   };
 
   return {
-    zh: languagePackage(record.zh, zhFallback),
-    en: languagePackage(record.en, enFallback),
+    zh: languagePackage(zhSource, zhFallback),
+    en: languagePackage(enSource, enFallback),
   };
 }
 

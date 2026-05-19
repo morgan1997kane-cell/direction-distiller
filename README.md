@@ -384,3 +384,14 @@ v0.4.6.1: regression and clarity patch. Fixed mobile Creative Workbench overflow
 - 不删除 Archive / Autosave / Export / Section Editing / Partial Regeneration
 - 不混入 Portfolio / Asset Organizer 功能
 - 继续使用当前 localStorage 架构
+
+v0.4.7 implementation notes:
+
+- Adds a clearer active project / proposal case workspace when a Project Archive item is restored.
+- Adds a lightweight Project Header with title, project type, output goal, provider / model, AI mode, updated time, favorite state, Archive return action, and Export entry.
+- Keeps restored Archive projects connected to their original archive record; saving edits updates that record while Current Draft autosave remains a separate recovery state.
+- Hardens Live response compatibility by expanding provider alias normalization for candidates, recommended direction, direction package, proposal copy, bilingual prompt package, and execution advice.
+- Partial regeneration now normalizes returned section objects with the same compatibility layer instead of accepting raw provider aliases.
+- Workspace / result layout is widened for proposal work, Candidate Directions use one column on mobile, two on medium screens, and three on large screens.
+- Recommended Direction remains the primary visual section; Candidate Directions are comparison-focused; Direction Package / Proposal Copy / Prompt Package / Execution Advice stay progressively disclosed.
+- Mobile overflow protection from v0.4.6.1 must remain intact: 390px viewport should keep `scrollWidth` equal to viewport width.

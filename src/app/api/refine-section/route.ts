@@ -2,8 +2,15 @@ import OpenAI from "openai";
 import { NextResponse } from "next/server";
 import { getAIProviderConfig, isSupportedModel, isSupportedProvider } from "@/lib/aiProvider";
 import { extractJsonFromText } from "@/lib/extractJsonFromText";
-import { normalizePromptPackage } from "@/lib/promptPackage";
-import type { DirectionInput, DirectionResult, PromptPackage } from "@/lib/types";
+import {
+  normalizeCandidate,
+  normalizeDirectionPackageSection,
+  normalizeExecutionAdviceSection,
+  normalizePromptPackageSection,
+  normalizeProposalCopySection,
+  normalizeRecommendedDirection,
+} from "@/lib/normalizeDirectionResult";
+import type { DirectionInput, DirectionResult } from "@/lib/types";
 
 export const runtime = "nodejs";
 
@@ -149,30 +156,38 @@ function unwrapSection(sectionType: SectionType, parsed: unknown) {
   if (!isRecord(parsed)) return parsed;
 
   if (sectionType === "candidate_direction") {
-    return parsed.candidate_direction ?? parsed.candidate ?? parsed;
+    return parsed.candidate_direction ?? parsed.candidateDirection ?? parsed.candidate ?? parsed.direction ?? parsed.section ?? parsed;
   }
 
-  return parsed[sectionType] ?? parsed.section ?? parsed;
+  const aliases: Record<SectionType, string[]> = {
+    candidate_direction: ["candidate_direction", "candidateDirection", "candidate", "direction"],
+    recommended_direction: ["recommended_direction", "recommendedDirection", "recommendation", "recommended", "section"],
+    direction_package: ["direction_package", "directionPackage", "visual_system", "visualSystem", "visual_language", "package", "section"],
+    proposal_copy: ["proposal_copy", "proposalCopy", "proposal", "proposal_text", "copy", "copywriting", "pitch", "section"],
+    prompt_package: ["prompt_package", "promptPackage", "prompts", "prompt", "prompt_draft", "section"],
+    execution_advice: ["execution_advice", "executionAdvice", "advice", "next_steps", "nextSteps", "action_plan", "workflow", "section"],
+  };
+
+  for (const key of aliases[sectionType]) {
+    if (parsed[key] !== undefined && parsed[key] !== null) return parsed[key];
+  }
+
+  return parsed;
 }
 
-function normalizeReturnedSection(sectionType: SectionType, parsed: unknown) {
+function normalizeReturnedSection(sectionType: SectionType, parsed: unknown, currentResult: DirectionResult, candidateId?: string) {
   const section = unwrapSection(sectionType, parsed);
+  const currentCandidate =
+    currentResult.candidate_directions.find((candidate) => candidate.id === candidateId) ?? currentResult.candidate_directions[0];
 
-  if (sectionType === "prompt_package" && isRecord(section)) {
-    const flat: PromptPackage = {
-      main_prompt: typeof section.main_prompt === "string" ? section.main_prompt : "",
-      variation_prompts: Array.isArray(section.variation_prompts) ? section.variation_prompts.filter((item): item is string => typeof item === "string") : [],
-      negative_constraints: Array.isArray(section.negative_constraints)
-        ? section.negative_constraints.filter((item): item is string => typeof item === "string")
-        : [],
-      zh: isRecord(section.zh) ? (section.zh as unknown as PromptPackage["zh"]) : undefined,
-      en: isRecord(section.en) ? (section.en as unknown as PromptPackage["en"]) : undefined,
-    };
-
-    return normalizePromptPackage(flat);
+  if (sectionType === "candidate_direction") {
+    return normalizeCandidate(section, currentCandidate?.type, currentResult.candidate_directions.indexOf(currentCandidate));
   }
-
-  return section;
+  if (sectionType === "recommended_direction") return normalizeRecommendedDirection(section, currentResult.candidate_directions);
+  if (sectionType === "direction_package") return normalizeDirectionPackageSection(section, currentCandidate);
+  if (sectionType === "proposal_copy") return normalizeProposalCopySection(section, currentResult.recommended_direction.title);
+  if (sectionType === "prompt_package") return normalizePromptPackageSection(section, currentResult.recommended_direction.title);
+  return normalizeExecutionAdviceSection(section);
 }
 
 export async function POST(request: Request) {
@@ -269,7 +284,7 @@ export async function POST(request: Request) {
 
     const jsonText = extractJsonFromText(content);
     const parsed = JSON.parse(jsonText) as unknown;
-    const section = normalizeReturnedSection(body.sectionType, parsed);
+    const section = normalizeReturnedSection(body.sectionType, parsed, currentResult, candidateId);
 
     return NextResponse.json({
       section,

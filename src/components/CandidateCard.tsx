@@ -17,7 +17,7 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
   );
 
   return (
-    <article className="flex min-w-[18rem] flex-col bg-[#101216]/75 p-5 transition hover:bg-[#14171b]/85 md:p-6">
+    <article className="flex h-full min-w-0 flex-col bg-[#101216]/70 p-5 transition hover:bg-[#14171b]/85 md:p-6">
       <div className="flex flex-wrap items-center gap-3">
         <span className={`whitespace-nowrap border px-3 py-1 text-xs ${typeTone[candidate.type]}`}>
           {candidate.type}
@@ -25,7 +25,7 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
         <span className="text-xs uppercase tracking-[0.18em] text-zinc-600">Strategy Card</span>
       </div>
 
-      <div className="mt-6">
+      <div className="mt-6 min-w-0">
         <h3 className="whitespace-normal break-words text-2xl font-medium leading-snug text-zinc-50">
           {candidate.title}
         </h3>
@@ -34,12 +34,12 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
         </p>
       </div>
 
-      <div className="mt-7 grid gap-5">
+      <div className="mt-7 grid min-w-0 gap-5">
         <KeywordGroup label="视觉关键词" items={candidate.visual_keywords} />
         <KeywordGroup label="情绪关键词" items={candidate.mood_keywords} accent />
       </div>
 
-      <div className="mt-7 grid gap-4 text-sm leading-7">
+      <div className="mt-7 grid min-w-0 gap-4 text-sm leading-7">
         <p className="whitespace-normal break-words border-l border-white/10 pl-4 text-zinc-400">
           <span className="text-zinc-200">优势：</span>
           {candidate.strength}

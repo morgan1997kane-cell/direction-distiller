@@ -39,7 +39,7 @@ export function ExportPanel({ result, onExport }: ExportPanelProps) {
   }
 
   return (
-    <section className="quiet-panel p-5">
+    <section id="export-panel" className="quiet-panel p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/38">Export</p>

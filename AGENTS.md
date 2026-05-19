@@ -476,6 +476,17 @@ v0.4.6.1: regression and clarity patch. Fixed mobile Creative Workbench overflow
 - 不混入 Portfolio / Asset Organizer 功能
 - 继续使用当前 localStorage 架构
 
+v0.4.7 implementation notes:
+
+- Adds a clearer active project / proposal case workspace when a Project Archive item is restored.
+- Adds a lightweight Project Header with title, project type, output goal, provider / model, AI mode, updated time, favorite state, Back to Archive, and Export.
+- Archive edits should update the restored archive record when saved; Current Draft autosave remains a separate recovery state.
+- Live response compatibility is more tolerant of provider aliases across candidate directions, recommended direction, direction package, proposal copy, prompt package, and execution advice.
+- Partial regeneration responses must pass through the same section-level normalizers before reaching the frontend editors.
+- Candidate Directions should render as three columns on large screens, two on medium screens, and one on mobile, with `min-w-0` and wrapping text to avoid overflow.
+- Project Header, Candidate Cards, Export, and sticky actions must not create horizontal overflow on a 390px viewport.
+- Do not add Xiaomi / MiMo or any other provider in v0.4.7; future providers may use the existing OpenAI-compatible provider architecture after a separate explicit task.
+
 ## Notes for Future Codex Sessions
 
 如果这是一个新 Codex 会话，请先阅读本文件，再读取当前代码。

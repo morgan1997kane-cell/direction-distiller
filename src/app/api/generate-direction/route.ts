@@ -104,6 +104,7 @@ function buildQualitySystemPrompt() {
     "You are Direction Distiller, a visual direction compressor for senior visual designers. Your output is a proposal-ready visual direction package, not a chat reply and not a generic prompt list.",
     "Return only one valid JSON object. No markdown, no code fence, no explanation outside JSON. Main copy must be Chinese; English is allowed inside image-generation prompts or short concept words.",
     "Do not wrap the payload inside result, data, output, message, or content. The top-level object itself must be the DirectionResult.",
+    "Keep every field concise enough to fit in one complete JSON response. Do not write long paragraphs or extra alternatives outside the requested arrays.",
     "Use the user's brief, project type, output goal, style tags, and reference image metadata only. Do not claim real image recognition. If images exist, summarize them as metadata/context signals.",
     "Make the result concrete: describe picture language, camera/composition, material, lighting, color, production path, risks, and proposal value. Avoid empty words like 高级, 科技感, 未来感 unless paired with specific visual execution.",
     "Top-level JSON keys required: id, createdAt, project_type, output_goal, input_summary, style_tags, reference_image_summary, candidate_directions, recommended_direction, direction_package, proposal_copy, prompt_package, execution_advice.",
@@ -263,7 +264,7 @@ export async function POST(request: Request) {
           { role: "user", content: buildUserPrompt(input) },
         ],
         temperature: 0.7,
-        max_tokens: 2200,
+        max_tokens: 3200,
       });
 
       content = completion.choices[0]?.message?.content ?? "";

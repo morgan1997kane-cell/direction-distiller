@@ -395,3 +395,15 @@ v0.4.7 implementation notes:
 - Workspace / result layout is widened for proposal work, Candidate Directions use one column on mobile, two on medium screens, and three on large screens.
 - Recommended Direction remains the primary visual section; Candidate Directions are comparison-focused; Direction Package / Proposal Copy / Prompt Package / Execution Advice stay progressively disclosed.
 - Mobile overflow protection from v0.4.6.1 must remain intact: 390px viewport should keep `scrollWidth` equal to viewport width.
+
+## v0.4.7.1 Workspace Visual Integration Patch
+
+- v0.4.7.1 is a visual integration patch for the Single Project Workspace.
+- No new provider was added; Xiaomi / MiMo remains only a future provider candidate.
+- No AI API or normalize layer refactor was introduced in this patch.
+- Generated-result mode now reduces landing/product intro prominence so Direction Proposal becomes the main workspace focus.
+- Project Header is lighter and behaves more like a workspace status bar.
+- Recommended Direction is promoted as the first visual focus of the proposal workspace.
+- Candidate Directions keep the large-screen three-column layout with lower card density and reduced score noise.
+- Direction Package, Proposal Copy, Prompt Package, Execution Advice, Export, and Archive actions remain available but visually secondary.
+- Mobile overflow protection remains required: 390px viewport should keep `innerWidth=390` and `scrollWidth=390`.

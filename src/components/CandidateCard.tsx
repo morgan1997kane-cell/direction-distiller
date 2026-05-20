@@ -1,10 +1,9 @@
 import type { DirectionCandidate } from "@/lib/types";
-import { ScoreBars } from "@/components/ScoreBars";
 
 const typeTone: Record<DirectionCandidate["type"], string> = {
-  稳妥型: "border-zinc-300/20 text-zinc-200",
-  大胆型: "border-cyan-200/30 text-cyan-100",
-  执行型: "border-emerald-200/25 text-emerald-100",
+  稳妥型: "text-zinc-200",
+  大胆型: "text-cyan-100",
+  执行型: "text-emerald-100",
 };
 
 export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) {
@@ -17,27 +16,22 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
   );
 
   return (
-    <article className="flex h-full min-w-0 flex-col bg-[#101216]/70 p-5 transition hover:bg-[#14171b]/85 md:p-6">
-      <div className="flex flex-wrap items-center gap-3">
-        <span className={`whitespace-nowrap border px-3 py-1 text-xs ${typeTone[candidate.type]}`}>
-          {candidate.type}
-        </span>
-        <span className="text-xs uppercase tracking-[0.18em] text-zinc-600">Strategy Card</span>
+    <article className="flex h-full min-w-0 flex-col border-t border-white/10 bg-white/[0.025] p-5 transition hover:bg-white/[0.04] md:p-6">
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <span className={`whitespace-nowrap text-xs uppercase tracking-[0.18em] ${typeTone[candidate.type]}`}>{candidate.type}</span>
+        <span className="font-mono text-sm text-zinc-500">{average}</span>
       </div>
 
       <div className="mt-6 min-w-0">
-        <h3 className="whitespace-normal break-words text-2xl font-medium leading-snug text-zinc-50">
+        <h3 className="whitespace-normal break-words text-2xl font-medium leading-snug text-zinc-50 md:text-3xl">
           {candidate.title}
         </h3>
-          <p className="mt-4 whitespace-normal break-words text-base leading-8 text-zinc-300">
+        <p className="mt-4 whitespace-normal break-words text-base leading-8 text-zinc-300">
           {candidate.one_line_concept}
         </p>
       </div>
 
-      <div className="mt-7 grid min-w-0 gap-5">
-        <KeywordGroup label="视觉关键词" items={candidate.visual_keywords} />
-        <KeywordGroup label="情绪关键词" items={candidate.mood_keywords} accent />
-      </div>
+      <KeywordGroup items={[...candidate.visual_keywords, ...candidate.mood_keywords].slice(0, 5)} />
 
       <div className="mt-7 grid min-w-0 gap-4 text-sm leading-7">
         <p className="whitespace-normal break-words border-l border-white/10 pl-4 text-zinc-400">
@@ -50,36 +44,23 @@ export function CandidateCard({ candidate }: { candidate: DirectionCandidate }) 
         </p>
       </div>
 
-      <div className="mt-7 border-t border-white/10 pt-5">
-        <div className="mb-4 flex items-end justify-between gap-4">
-          <p className="text-xs uppercase tracking-[0.18em] text-zinc-600">Direction Fit</p>
-          <p className="font-mono text-xl text-zinc-300">{average}</p>
+      <div className="mt-auto pt-7">
+        <div className="h-px w-full bg-white/10">
+          <div className="h-px bg-cyan-100/35" style={{ width: `${average}%` }} />
         </div>
-        <ScoreBars scores={candidate.scores} />
       </div>
     </article>
   );
 }
 
-function KeywordGroup({ label, items, accent = false }: { label: string; items: string[]; accent?: boolean }) {
+function KeywordGroup({ items }: { items: string[] }) {
   return (
-    <div>
-      <p className="mb-3 text-xs text-zinc-600">{label}</p>
-      <div className="flex flex-wrap gap-2">
-        {items.map((keyword) => (
-          <span
-            key={keyword}
-            className={[
-              "border px-2.5 py-1.5 text-xs leading-none",
-              accent
-                ? "border-cyan-200/15 bg-cyan-300/[0.055] text-cyan-100/80"
-                : "border-white/10 bg-white/[0.035] text-zinc-300",
-            ].join(" ")}
-          >
-            {keyword}
-          </span>
-        ))}
-      </div>
+    <div className="mt-6 flex flex-wrap gap-x-3 gap-y-2">
+      {items.map((keyword) => (
+        <span key={keyword} className="text-xs leading-5 text-zinc-500">
+          {keyword}
+        </span>
+      ))}
     </div>
   );
 }

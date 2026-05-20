@@ -139,6 +139,7 @@ export function InputComposer() {
     styleTags: selectedStyles,
   };
   const activeProject = activeProjectId ? history.find((item) => item.id === activeProjectId) : null;
+  const hasWorkspace = Boolean(result || isGenerating);
 
   useEffect(() => {
     const timer = window.setTimeout(() => {
@@ -386,15 +387,22 @@ export function InputComposer() {
         </section>
       ) : null}
 
-      <section className="mx-auto grid w-full max-w-[1600px] gap-10 px-5 pb-20 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start">
-        <div className="studio-surface min-w-0 p-5 md:p-8 lg:p-10">
+      <section
+        className={[
+          "mx-auto grid w-full max-w-[1600px] gap-8 px-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start",
+          hasWorkspace ? "pb-10" : "pb-20",
+        ].join(" ")}
+      >
+        <div className={["min-w-0", hasWorkspace ? "border-y border-white/10 py-5" : "studio-surface p-5 md:p-8 lg:p-10"].join(" ")}>
           <WorkflowStepper currentStep={isGenerating ? "generate" : workflowStep} />
-          <div className="mb-7 flex flex-col gap-5 md:flex-row md:items-start md:justify-between">
+          <div className={["flex flex-col gap-5 md:flex-row md:items-start md:justify-between", hasWorkspace ? "mb-5" : "mb-7"].join(" ")}>
             <div>
               <p className="text-xs uppercase tracking-[0.28em] text-cyan-100/45">Creative Workbench</p>
-              <h2 className="mt-4 text-3xl font-semibold leading-tight text-zinc-50 md:text-5xl">创意简报输入台</h2>
-              <p className="mt-5 max-w-2xl text-base leading-8 text-zinc-400">
-                不用写完整方案，一句话、几张参考图，或一个模糊感觉都可以开始。
+              <h2 className={["mt-3 font-semibold leading-tight text-zinc-50", hasWorkspace ? "text-2xl md:text-3xl" : "text-3xl md:text-5xl"].join(" ")}>
+                创意简报输入台
+              </h2>
+              <p className={["max-w-2xl leading-7 text-zinc-500", hasWorkspace ? "mt-3 text-sm" : "mt-5 text-base md:leading-8"].join(" ")}>
+                {hasWorkspace ? "输入区保留为当前 proposal 的上下文，可随时调整后重新生成。" : "不用写完整方案，一句话、几张参考图，或一个模糊感觉都可以开始。"}
               </p>
             </div>
             {isGenerating ? (
@@ -405,7 +413,7 @@ export function InputComposer() {
             ) : null}
           </div>
 
-          <div className="soft-panel p-5 md:p-6">
+          <div className={hasWorkspace ? "border-t border-white/10 pt-5" : "soft-panel p-5 md:p-6"}>
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Brief</p>
               <p className="text-xs text-zinc-600">{brief.trim().length} chars</p>
@@ -414,7 +422,10 @@ export function InputComposer() {
               value={brief}
               onChange={(event) => setBrief(event.target.value)}
               placeholder="粘贴你的项目 brief、灵感片段、画面想法或客户需求。例如：我想做一组偏未来感、高反差、冷色金属质感的汽车广告视觉……"
-              className="min-h-80 w-full resize-y bg-transparent text-lg leading-9 text-zinc-100 outline-none placeholder:text-zinc-600 md:min-h-96"
+              className={[
+                "w-full resize-y bg-transparent text-zinc-100 outline-none placeholder:text-zinc-600",
+                hasWorkspace ? "min-h-36 text-base leading-8 md:min-h-44" : "min-h-80 text-lg leading-9 md:min-h-96",
+              ].join(" ")}
             />
           </div>
 
@@ -424,7 +435,7 @@ export function InputComposer() {
             </div>
           ) : null}
 
-          <div className="mt-10 grid gap-9">
+          <div className={["grid", hasWorkspace ? "mt-6 gap-6" : "mt-10 gap-9"].join(" ")}>
             <div className="grid gap-8 xl:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
               <ImageUploader images={referenceImages} onChange={setReferenceImages} />
               <div className="grid gap-7">
@@ -512,10 +523,6 @@ export function InputComposer() {
         </div>
       </section>
 
-      <ValueFlow />
-      <ExamplePrompts onSelect={fillExample} />
-      <ProductIntro />
-
       <div ref={resultRef} className="mx-auto w-full max-w-[1600px] px-5 pb-24">
         {isGenerating ? (
           <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
@@ -559,6 +566,14 @@ export function InputComposer() {
           </div>
         ) : null}
       </div>
+
+      {!hasWorkspace ? (
+        <>
+          <ValueFlow />
+          <ExamplePrompts onSelect={fillExample} />
+          <ProductIntro />
+        </>
+      ) : null}
     </main>
   );
 }

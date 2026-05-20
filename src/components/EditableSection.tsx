@@ -70,14 +70,14 @@ export function EditableSection<T>({
   }
 
   return (
-    <section className="min-w-0 border-t border-white/10 py-9 md:py-12">
+    <section className="min-w-0 border-t border-white/10 py-8 md:py-11">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          {label ? <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-100/35">{label}</p> : null}
-          <h3 className="mt-3 text-2xl font-semibold leading-snug text-zinc-50 md:text-4xl">{title}</h3>
+          {label ? <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-100/30">{label}</p> : null}
+          <h3 className="mt-2 text-2xl font-semibold leading-snug text-zinc-50 md:text-3xl">{title}</h3>
           {description ? <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-500">{description}</p> : null}
         </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-2">
+        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
           {message ? <span className="text-xs text-cyan-100/70">{message}</span> : null}
           <SectionButton onClick={startEditing}>Edit</SectionButton>
           <SectionButton onClick={() => setShowInstruction((current) => !current)} disabled={isRegenerating}>
@@ -91,13 +91,13 @@ export function EditableSection<T>({
       </div>
 
       {!isExpanded && !isEditing ? (
-        <div className="quiet-panel mt-5 px-4 py-3 text-sm leading-7 text-zinc-400">
+        <div className="mt-5 border-l border-white/10 pl-4 text-sm leading-7 text-zinc-500">
           {summary ?? <span className="text-zinc-500">已折叠，展开查看完整内容。</span>}
         </div>
       ) : null}
 
       {showInstruction && isExpanded ? (
-        <div className="quiet-panel mt-5 flex flex-col gap-3 p-4 md:flex-row">
+        <div className="mt-5 flex flex-col gap-3 border-y border-white/10 py-4 md:flex-row">
           <input
             value={instruction}
             onChange={(event) => setInstruction(event.target.value)}
@@ -108,7 +108,7 @@ export function EditableSection<T>({
             type="button"
             onClick={submitRegenerate}
             disabled={isRegenerating}
-            className="border border-cyan-200/20 bg-cyan-300/[0.07] px-4 py-2 text-xs text-cyan-50 transition hover:bg-cyan-300/[0.12] disabled:opacity-50"
+            className="border border-cyan-200/15 bg-cyan-300/[0.045] px-4 py-2 text-xs text-cyan-50 transition hover:bg-cyan-300/[0.1] disabled:opacity-50"
           >
             开始局部重生成
           </button>
@@ -142,11 +142,11 @@ export function CollapsibleSection({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <section className="min-w-0 border-t border-white/10 py-9 md:py-12">
+    <section className="min-w-0 border-t border-white/10 py-8 md:py-11">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
-          {label ? <p className="text-[11px] uppercase tracking-[0.24em] text-cyan-100/35">{label}</p> : null}
-          <h3 className="mt-3 text-2xl font-semibold leading-snug text-zinc-50 md:text-4xl">{title}</h3>
+          {label ? <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-100/30">{label}</p> : null}
+          <h3 className="mt-2 text-2xl font-semibold leading-snug text-zinc-50 md:text-3xl">{title}</h3>
           {description ? <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-500">{description}</p> : null}
         </div>
         <SectionButton onClick={() => setIsExpanded((current) => !current)} ariaExpanded={isExpanded}>
@@ -155,7 +155,7 @@ export function CollapsibleSection({
       </div>
 
       {!isExpanded ? (
-        <div className="quiet-panel mt-5 px-4 py-3 text-sm leading-7 text-zinc-400">
+        <div className="mt-5 border-l border-white/10 pl-4 text-sm leading-7 text-zinc-500">
           {summary ?? <span className="text-zinc-500">已折叠，展开查看完整内容。</span>}
         </div>
       ) : (
@@ -182,7 +182,7 @@ function SectionButton({
       onClick={onClick}
       disabled={disabled}
       aria-expanded={ariaExpanded}
-      className="border border-white/10 bg-white/[0.02] px-3 py-2 text-xs text-zinc-500 transition hover:border-cyan-100/25 hover:bg-white/[0.045] hover:text-cyan-50 disabled:cursor-not-allowed disabled:opacity-50"
+      className="px-2.5 py-1.5 text-xs text-zinc-500 transition hover:text-cyan-50 disabled:cursor-not-allowed disabled:opacity-50"
     >
       {children}
     </button>

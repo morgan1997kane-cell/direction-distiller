@@ -39,7 +39,7 @@ export function ExportPanel({ result, onExport }: ExportPanelProps) {
   }
 
   return (
-    <section id="export-panel" className="quiet-panel p-5">
+    <section id="export-panel" className="rounded-[18px] border border-white/[0.08] bg-white/[0.018] p-5">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.24em] text-cyan-100/38">Export</p>
@@ -49,7 +49,7 @@ export function ExportPanel({ result, onExport }: ExportPanelProps) {
         {notice ? <p className="text-xs text-cyan-100/80">{notice}</p> : null}
       </div>
 
-      <div className="mt-4 flex flex-wrap gap-2">
+      <div className="mt-4 flex min-w-0 flex-wrap gap-2">
         <ExportButton onClick={() => run("已复制 Markdown", () => copyMarkdownExport(result))}>复制 Markdown</ExportButton>
         <ExportButton onClick={() => run("已下载 .md", downloadMarkdown)}>下载 .md</ExportButton>
         <ExportButton onClick={() => run("已复制客户版", () => copyClientExport(result))}>复制客户版</ExportButton>
@@ -64,7 +64,7 @@ function ExportButton({ children, onClick }: { children: React.ReactNode; onClic
     <button
       type="button"
       onClick={onClick}
-      className="border border-white/10 bg-black/20 px-3 py-2 text-sm text-zinc-400 transition hover:border-cyan-100/30 hover:bg-cyan-100/[0.07] hover:text-cyan-50"
+      className="min-w-0 rounded-[12px] border border-white/10 bg-black/[0.15] px-3 py-2 text-sm text-zinc-400 transition hover:border-cyan-100/30 hover:bg-cyan-100/[0.07] hover:text-cyan-50"
     >
       {children}
     </button>

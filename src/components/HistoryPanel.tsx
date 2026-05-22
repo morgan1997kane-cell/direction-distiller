@@ -74,7 +74,7 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
   }
 
   return (
-    <aside className="quiet-panel p-5 lg:sticky lg:top-6">
+    <aside className="quiet-panel rounded-[24px] p-5 lg:sticky lg:top-6">
       <div className="mb-6 flex items-start justify-between gap-3">
         <div>
           <p className="text-xs uppercase tracking-[0.22em] text-zinc-600">Project Archive</p>
@@ -125,7 +125,7 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
       ) : (
         <div className="mt-5 space-y-3">
           {visibleItems.map((item) => (
-            <article key={item.id} className="bg-black/[0.12] px-3 py-4 transition hover:bg-white/[0.035]">
+            <article key={item.id} className="rounded-[18px] bg-black/[0.12] px-3 py-4 transition hover:bg-white/[0.035]">
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0 flex-1">
                   {editingId === item.id ? (
@@ -187,7 +187,7 @@ export function HistoryPanel({ items, onRestore, onDelete, onClear, onRename, on
 }
 
 function ArchiveTag({ children }: { children: React.ReactNode }) {
-  return <span className="border border-white/10 bg-white/[0.025] px-2 py-1">{children}</span>;
+  return <span className="rounded-full border border-white/10 bg-white/[0.025] px-2 py-1">{children}</span>;
 }
 
 function ArchiveAction({ children, onClick, danger = false }: { children: React.ReactNode; onClick: () => void; danger?: boolean }) {

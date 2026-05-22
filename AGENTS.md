@@ -487,16 +487,16 @@ v0.4.7 implementation notes:
 - Project Header, Candidate Cards, Export, and sticky actions must not create horizontal overflow on a 390px viewport.
 - Do not add Xiaomi / MiMo or any other provider in v0.4.7; future providers may use the existing OpenAI-compatible provider architecture after a separate explicit task.
 
-## v0.4.7.1 Workspace Visual Integration Patch
+## v0.4.7.1 Reference-led Workspace Rework
 
-- v0.4.7.1 is a visual integration patch, not a provider or AI API change.
+- v0.4.7.1 is a reference-led visual rework, not a provider or AI API change.
 - Do not add Xiaomi / MiMo provider, provider UI, or provider list changes in this patch.
 - Do not refactor the AI API or normalize layer unless a visual edit creates a type/build issue.
-- Generated-result mode should make Direction Proposal / Workspace the primary flow and reduce landing/product intro prominence.
-- Creative Workbench may remain available after generation, but it should feel lighter than the result workspace.
-- Project Header should behave like a lightweight status bar, not a heavy card.
-- Recommended Direction should be the first visual focal point of the workspace.
-- Candidate Directions should remain large-screen three columns, medium two columns, and mobile one column, with lower density and no horizontal overflow.
+- The result system follows `Workspace Shell -> Recommended Stage -> Candidate Board -> Details Stack -> Export Utility`.
+- Generated-result mode should make Direction Proposal / Workspace the primary flow and move Creative Workbench into a compact supporting context.
+- Project Header should behave like a Compact Project Bar, not a heavy card.
+- Recommended Direction should be the first visual focal point of the workspace, with soft editorial staging.
+- Candidate Directions should remain large-screen three columns, medium two columns, and mobile one column, with lower density, rounded cards, and no horizontal overflow.
 - Direction Package, Proposal Copy, Prompt Package, Execution Advice, Export, and Archive actions should stay available but visually secondary.
 - Preserve v0.4.6.1 mobile overflow fix: a 390px viewport should keep `innerWidth=390` and `scrollWidth=390`.
 

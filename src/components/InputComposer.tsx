@@ -353,9 +353,54 @@ export function InputComposer() {
     discardCurrentDraft();
   }
 
+  const workspace = (
+    <div ref={resultRef} className="mx-auto w-[min(98vw,1900px)] max-w-none px-2 pb-10 pt-4 sm:px-3 lg:px-4">
+      {isGenerating ? (
+        <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
+      ) : result && resultInput ? (
+        <ResultPanel
+          result={result}
+          input={resultInput}
+          provider={aiProvider}
+          model={aiModel}
+          saved={Boolean(savedResultId)}
+          edited={hasEditedResult}
+          projectBar={
+            <ProjectWorkspaceHeader
+              activeProject={activeProject}
+              result={result}
+              input={resultInput}
+              saved={Boolean(savedResultId)}
+              edited={hasEditedResult}
+              autosavedAt={autosavedAt}
+              onBackToArchive={() => archiveRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
+              onExport={() => {
+                setWorkflowStep("export");
+                window.setTimeout(() => document.getElementById("export-panel")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
+              }}
+              onToggleFavorite={(id) => setHistory(toggleArchiveFavorite(id))}
+            />
+          }
+          onResultChange={(nextResult) => {
+            setResult(nextResult);
+            setSavedResultId("");
+            setWorkflowStep("refine");
+            setHasEditedResult(true);
+            const draft = updateCurrentDraftResult(nextResult);
+            if (draft) setAutosavedAt(draft.updatedAt);
+          }}
+          onSave={saveCurrent}
+          onRegenerate={runGenerate}
+          onClear={clearInput}
+          onExport={() => setWorkflowStep("export")}
+        />
+      ) : null}
+    </div>
+  );
+
   return (
     <main className="overflow-hidden">
-      <Hero />
+      {!hasWorkspace ? <Hero /> : null}
       <VersionBadge />
 
       {draftToRecover ? (
@@ -387,13 +432,20 @@ export function InputComposer() {
         </section>
       ) : null}
 
+      {hasWorkspace ? workspace : null}
+
       <section
         className={[
-          "mx-auto grid w-full max-w-[1600px] gap-8 px-5 lg:grid-cols-[minmax(0,1fr)_360px] lg:items-start",
-          hasWorkspace ? "pb-10" : "pb-20",
+          "mx-auto grid w-[min(98vw,1900px)] max-w-none gap-6 px-2 sm:px-3 lg:grid-cols-[minmax(0,1fr)_340px] lg:items-start lg:px-4 2xl:grid-cols-[minmax(0,1fr)_380px]",
+          hasWorkspace ? "pb-10 pt-2" : "pb-20",
         ].join(" ")}
       >
-        <div className={["min-w-0", hasWorkspace ? "border-y border-white/10 py-5" : "studio-surface p-5 md:p-8 lg:p-10"].join(" ")}>
+        <div
+          className={[
+            "min-w-0",
+            hasWorkspace ? "rounded-[24px] border border-white/[0.06] bg-black/[0.16] p-4 opacity-80 md:p-5" : "studio-surface p-5 md:p-8 lg:p-10",
+          ].join(" ")}
+        >
           <WorkflowStepper currentStep={isGenerating ? "generate" : workflowStep} />
           <div className={["flex flex-col gap-5 md:flex-row md:items-start md:justify-between", hasWorkspace ? "mb-5" : "mb-7"].join(" ")}>
             <div>
@@ -413,7 +465,7 @@ export function InputComposer() {
             ) : null}
           </div>
 
-          <div className={hasWorkspace ? "border-t border-white/10 pt-5" : "soft-panel p-5 md:p-6"}>
+          <div className={hasWorkspace ? "rounded-[16px] border border-white/[0.08] bg-black/[0.12] p-4" : "soft-panel p-5 md:p-6"}>
             <div className="mb-4 flex items-center justify-between gap-3">
               <p className="text-xs uppercase tracking-[0.22em] text-zinc-500">Brief</p>
               <p className="text-xs text-zinc-600">{brief.trim().length} chars</p>
@@ -423,7 +475,7 @@ export function InputComposer() {
               onChange={(event) => setBrief(event.target.value)}
               placeholder="粘贴你的项目 brief、灵感片段、画面想法或客户需求。例如：我想做一组偏未来感、高反差、冷色金属质感的汽车广告视觉……"
               className={[
-                "w-full resize-y bg-transparent text-zinc-100 outline-none placeholder:text-zinc-600",
+                "w-full min-w-0 resize-y bg-transparent text-zinc-100 outline-none placeholder:text-zinc-600",
                 hasWorkspace ? "min-h-36 text-base leading-8 md:min-h-44" : "min-h-80 text-lg leading-9 md:min-h-96",
               ].join(" ")}
             />
@@ -483,6 +535,12 @@ export function InputComposer() {
             </p>
           ) : null}
 
+          {hasWorkspace && result ? (
+            <div className="mt-5">
+              <NextActionPanel step={workflowStep} result={result} saved={Boolean(savedResultId)} edited={hasEditedResult} />
+            </div>
+          ) : null}
+
           <div className="mt-10 flex flex-wrap items-center gap-3 border-t border-white/10 pt-7">
             <button
               type="button"
@@ -523,49 +581,7 @@ export function InputComposer() {
         </div>
       </section>
 
-      <div ref={resultRef} className="mx-auto w-full max-w-[1600px] px-5 pb-24">
-        {isGenerating ? (
-          <GenerationLoadingState provider={aiProvider} model={aiModel} stage={generationStages[generationStageIndex]} />
-        ) : result && resultInput ? (
-          <div className="space-y-6">
-            <NextActionPanel step={workflowStep} result={result} saved={Boolean(savedResultId)} edited={hasEditedResult} />
-            <ProjectWorkspaceHeader
-              activeProject={activeProject}
-              result={result}
-              input={resultInput}
-              saved={Boolean(savedResultId)}
-              edited={hasEditedResult}
-              autosavedAt={autosavedAt}
-              onBackToArchive={() => archiveRef.current?.scrollIntoView({ behavior: "smooth", block: "start" })}
-              onExport={() => {
-                setWorkflowStep("export");
-                window.setTimeout(() => document.getElementById("export-panel")?.scrollIntoView({ behavior: "smooth", block: "start" }), 50);
-              }}
-              onToggleFavorite={(id) => setHistory(toggleArchiveFavorite(id))}
-            />
-            <ResultPanel
-              result={result}
-              input={resultInput}
-              provider={aiProvider}
-              model={aiModel}
-              saved={Boolean(savedResultId)}
-              edited={hasEditedResult}
-              onResultChange={(nextResult) => {
-                setResult(nextResult);
-                setSavedResultId("");
-                setWorkflowStep("refine");
-                setHasEditedResult(true);
-                const draft = updateCurrentDraftResult(nextResult);
-                if (draft) setAutosavedAt(draft.updatedAt);
-              }}
-              onSave={saveCurrent}
-              onRegenerate={runGenerate}
-              onClear={clearInput}
-              onExport={() => setWorkflowStep("export")}
-            />
-          </div>
-        ) : null}
-      </div>
+      {!hasWorkspace ? workspace : null}
 
       {!hasWorkspace ? (
         <>

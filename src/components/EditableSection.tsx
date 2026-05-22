@@ -15,6 +15,7 @@ interface EditableSectionProps<T> {
   description?: string;
   summary?: React.ReactNode;
   defaultExpanded?: boolean;
+  presentation?: "default" | "card" | "stage";
   value: T;
   copyTextValue?: string;
   isRegenerating?: boolean;
@@ -30,6 +31,7 @@ export function EditableSection<T>({
   description,
   summary,
   defaultExpanded = true,
+  presentation = "default",
   value,
   copyTextValue,
   isRegenerating = false,
@@ -69,15 +71,34 @@ export function EditableSection<T>({
     setShowInstruction(false);
   }
 
+  const cardMode = presentation === "card";
+  const stageMode = presentation === "stage";
+
   return (
-    <section className="min-w-0 border-t border-white/10 py-8 md:py-11">
-      <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
-        <div className="min-w-0">
-          {label ? <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-100/30">{label}</p> : null}
-          <h3 className="mt-2 text-2xl font-semibold leading-snug text-zinc-50 md:text-3xl">{title}</h3>
-          {description ? <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-500">{description}</p> : null}
-        </div>
-        <div className="flex shrink-0 flex-wrap items-center gap-1.5">
+    <section
+      className={
+        cardMode
+          ? "flex h-full min-w-0 flex-col"
+          : stageMode
+            ? "min-w-0"
+            : "min-w-0 border-t border-white/[0.08] px-0 py-7 md:py-8"
+      }
+    >
+      <div
+        className={
+          cardMode || stageMode
+            ? "mb-3 flex flex-wrap items-center justify-end gap-1.5"
+            : "flex flex-col gap-4 md:flex-row md:items-start md:justify-between"
+        }
+      >
+        {!cardMode && !stageMode ? (
+          <div className="min-w-0">
+            {label ? <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-100/30">{label}</p> : null}
+            <h3 className="mt-2 text-2xl font-semibold leading-snug text-zinc-50 md:text-3xl">{title}</h3>
+            {description ? <p className="mt-3 max-w-3xl text-sm leading-7 text-zinc-500">{description}</p> : null}
+          </div>
+        ) : null}
+        <div className={stageMode ? "flex shrink-0 flex-wrap items-center gap-1.5 pr-1" : "flex shrink-0 flex-wrap items-center gap-1.5"}>
           {message ? <span className="text-xs text-cyan-100/70">{message}</span> : null}
           <SectionButton onClick={startEditing}>Edit</SectionButton>
           <SectionButton onClick={() => setShowInstruction((current) => !current)} disabled={isRegenerating}>
@@ -118,7 +139,7 @@ export function EditableSection<T>({
       {isEditing ? (
         <div className="mt-6">{renderEditor({ value, onCancel: () => setIsEditing(false), onSave: saveEdit })}</div>
       ) : isExpanded ? (
-        <div className="mt-6 min-w-0">{children}</div>
+        <div className={cardMode ? "min-w-0 flex-1" : stageMode ? "min-w-0" : "mt-6 min-w-0"}>{children}</div>
       ) : null}
     </section>
   );
@@ -142,7 +163,7 @@ export function CollapsibleSection({
   const [isExpanded, setIsExpanded] = useState(defaultExpanded);
 
   return (
-    <section className="min-w-0 border-t border-white/10 py-8 md:py-11">
+    <section className="min-w-0 border-t border-white/[0.08] px-0 py-7 md:py-8">
       <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
         <div className="min-w-0">
           {label ? <p className="text-[11px] uppercase tracking-[0.22em] text-cyan-100/30">{label}</p> : null}
